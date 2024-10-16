@@ -20,7 +20,7 @@ class Server {
     this.env = appInit.env;
     this.loadMiddlewares(appInit.middlewares);
     this.loadRoutes(appInit.controllers);
-    this.connectDB();
+    //this.connectDB();
   }
 
   private loadRoutes(controllers: AbstractController[]) {
