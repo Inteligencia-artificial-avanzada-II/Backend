@@ -2,6 +2,7 @@ import { Model, Sequelize } from "sequelize";
 
 // Interfaz que define los atributos del modelo UsuarioCaseta
 interface UsuarioCasetaAttributes {
+  idUsuarioCaseta: number;
   idUsuario: number;
   idCaseta: number;
 }
@@ -11,6 +12,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     extends Model<UsuarioCasetaAttributes>
     implements UsuarioCasetaAttributes
   {
+    public idUsuarioCaseta!: number;
     public idUsuario!: number;
     public idCaseta!: number;
     // Relación de oertenencia con el modelo Usuario
@@ -26,6 +28,12 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
 
   UsuarioCaseta.init(
     {
+      idUsuarioCaseta: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+
       idUsuario: {
         type: DataTypes.INTEGER,
         primaryKey: true,

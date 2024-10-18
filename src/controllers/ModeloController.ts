@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import AbstractController from "./AbstractController";
+import db from "../models";
 
 class ModeloController extends AbstractController {
   private static _instance: ModeloController;
