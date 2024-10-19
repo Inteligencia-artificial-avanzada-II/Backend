@@ -8,7 +8,8 @@
     "start": "node -r dotenv/config dist/index.js",
     "build:start": "tsc && node -r dotenv/config dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build:pm2": "tsc && pm2 start pm2.config.js"
+    "build:pm2": "tsc && pm2 start pm2.config.js",
+    "dev:watch": "nodemon"
   },
   "keywords": [],
   "author": "",
@@ -40,7 +41,8 @@
     "@types/joi": "^17.2.3",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.12.12",
+    "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.6.3"
   }
 }

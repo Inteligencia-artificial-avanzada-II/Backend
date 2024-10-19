@@ -10,3 +10,4 @@ export const DB_PORT: number = process.env.DB_PORT
   ? parseInt(process.env.DB_PORT)
   : 3306;
 export const PREFIX_NAME: string = NODE_ENV === "production" ? "" : "-DEV";
+export const SECRET_KEY: string = process.env.SECRET_KEY || "";

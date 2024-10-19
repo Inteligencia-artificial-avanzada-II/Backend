@@ -17,6 +17,7 @@ if (env === "development") {
     config.development.password,
     {
       dialect: "mysql",
+      logging: false,
       host: config.development.host,
       define: {
         // Evitar que nos ponga createdAT y updatedAt
@@ -47,12 +48,10 @@ fs.readdirSync(__dirname)
     );
   })
   .forEach((file) => {
-    console.log(file);
     const model = require(path.join(__dirname, file))(
       sequelize,
       Sequelize.DataTypes
     );
-    console.log(model.name);
     db[model.name] = model;
   });
 

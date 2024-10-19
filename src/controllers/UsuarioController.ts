@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import AbstractController from "./AbstractController";
 import db from "../models";
+import { createJWT, validateJWT } from "../utils/jwt";
+import { validateTokenMiddleware } from "../middlewares/validateToken"
 
 class UsuarioController extends AbstractController {
   private static _instance: UsuarioController;
@@ -13,13 +15,14 @@ class UsuarioController extends AbstractController {
   }
 
   protected initializeRoutes(): void {
-    this.router.get("/test", this.getTest.bind(this));
+    this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
     this.router.post("/crear", this.postCrear.bind(this));
     this.router.get("/consultarTodos", this.getTodos.bind(this));
     this.router.get("/consultar/:id", this.getPorId.bind(this));
     this.router.put("/actualizar/:id", this.putActualizar.bind(this));
     this.router.delete("/eliminar/:id", this.deletePorId.bind(this));
     this.router.post("/login", this.postLogin.bind(this));
+    this.router.post("/validatoken", this.postValidaToken.bind(this))
   }
 
   private async getTest(req: Request, res: Response) {
@@ -128,18 +131,48 @@ class UsuarioController extends AbstractController {
     try {
       const { userName, contraseña } = req.body;
       const usuario = await db.Usuario.findOne({ where: { userName } });
+      const idUsuario = usuario.idUsuario;
+      const rolUsuario = usuario.rol;
       if (!usuario) {
-        res.status(404).send("Usuario no encontrado");
+        res.status(404).json({ message: "Las credenciales ingresadas son incorrectas", data: {} });
         return;
       }
       const isPasswordValid = await usuario.validatePassword(contraseña);
       if (!isPasswordValid) {
-        res.status(401).send("Contraseña incorrecta");
+        res.status(401).json({ message: "Las credenciales ingresadas son incorrectas", data: {} });
         return;
       }
-      res.status(200).send(true);
+      const token = createJWT({ idUsuario: idUsuario, rolUsuario: rolUsuario })
+      res.status(200).json({ message: "Datos validados exitosamente", data: { isValid: true, token: token } });
     } catch (error) {
       res.status(500).send(`Error al hacer login: ${error}`);
+    }
+  }
+
+  private async postValidaToken(req: Request, res: Response) {
+    try {
+      const { token } = req.body
+
+      if (!token) {
+        return res.status(401).json({ message: 'Token no proporcionado', data: {} });
+      }
+
+      const decodedToken = validateJWT(token);
+
+      if (decodedToken) {
+        // Si el token es válido, devolver una respuesta exitosa
+        return res.status(200).json({
+          message: "Datos validados exitosamente",
+          data: { rolUsuario: decodedToken.rolUsuario }
+        });
+      } else {
+        // Si el token es inválido, devolver una respuesta de error
+        return res.status(401).json({ message: "Token no válido", data: {} });
+      }
+    } catch (err) {
+      // Manejo del error para que no se corte el backend
+      console.error('Error en el controlador:', err);
+      return res.status(500).json({ message: 'Error interno del servidor' });
     }
   }
 }
