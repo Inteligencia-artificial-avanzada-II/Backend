@@ -12,6 +12,7 @@ import OrdenController from "./controllers/OrdenController";
 import SalidaController from "./controllers/SalidaController";
 import UsuarioCasetaController from "./controllers/UsuarioCasetaController";
 import UsuarioController from "./controllers/UsuarioController";
+import QrController from "./controllers/QrController";
 
 const server = new Server({
   port: PORT,
@@ -28,6 +29,7 @@ const server = new Server({
     SalidaController.instance,
     UsuarioCasetaController.instance,
     UsuarioController.instance,
+    QrController.instance,
   ],
 });
 

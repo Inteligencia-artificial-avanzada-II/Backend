@@ -11,3 +11,8 @@ export const DB_PORT: number = process.env.DB_PORT
   : 3306;
 export const PREFIX_NAME: string = NODE_ENV === "production" ? "" : "-DEV";
 export const SECRET_KEY: string = process.env.SECRET_KEY || "";
+export const USER: string = process.env.USER || "";
+export const FINGERPRINT: string = process.env.FINGERPRINT || "";
+export const TENANCY: string = process.env.TENANCY || "";
+export const REGION: string = process.env.REGION || "";
+export const KEY_FILE: string = process.env.KEY_FILE || "";

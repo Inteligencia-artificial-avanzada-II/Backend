@@ -1,4 +1,15 @@
-import { DB_NAME, DB_PASSWORD, DB_USER, DB_HOST, SECRET_KEY } from "./index";
+import {
+  DB_NAME,
+  DB_PASSWORD,
+  DB_USER,
+  DB_HOST,
+  SECRET_KEY,
+  USER,
+  FINGERPRINT,
+  TENANCY,
+  REGION,
+  KEY_FILE,
+} from "./index";
 
 export default {
   development: {
@@ -24,5 +35,12 @@ export default {
     host: "127.0.0.1",
     dialect: "mysql",
     secretKey: SECRET_KEY,
+  },
+  oracle: {
+    user: USER,
+    fingerprint: FINGERPRINT,
+    tenancy: TENANCY,
+    region: REGION,
+    key_file: KEY_FILE,
   },
 };
