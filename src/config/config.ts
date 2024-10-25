@@ -3,6 +3,7 @@ import {
   DB_PASSWORD,
   DB_USER,
   DB_HOST,
+  MONGO_DB,
   SECRET_KEY,
   USER,
   FINGERPRINT,
@@ -19,6 +20,7 @@ export default {
     host: DB_HOST,
     dialect: "mysql",
     secretKey: SECRET_KEY,
+    mongoDb: MONGO_DB,
   },
   test: {
     username: "root",
@@ -27,6 +29,7 @@ export default {
     host: "127.0.0.1",
     dialect: "mysql",
     secretKey: SECRET_KEY,
+    mongoDb: MONGO_DB,
   },
   production: {
     username: "root",
@@ -35,6 +38,7 @@ export default {
     host: "127.0.0.1",
     dialect: "mysql",
     secretKey: SECRET_KEY,
+    mongoDb: MONGO_DB,
   },
   oracle: {
     user: USER,

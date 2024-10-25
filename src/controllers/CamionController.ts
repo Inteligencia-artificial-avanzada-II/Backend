@@ -4,6 +4,18 @@ import db from "../models";
 import { afterEach } from "node:test";
 
 class CamionController extends AbstractController {
+  /**
+   * Controlador para gestionar las operaciones relacionadas con camiones en la base de datos.
+   * 
+   * * Métodos:
+   * @method getTest Prueba de conexión con el controlador.
+   * @method postCrear Crea un nuevo camión en la base de datos.
+   * @method getTodos Obtiene todos los camiones almacenados.
+   * @method getPorId Obtiene un camión por su ID.
+   * @method putActualizar Actualiza los detalles de un camión por su ID.
+   * @method deletePorId Elimina un camión de la base de datos por su ID.
+   */
+
   private static _instance: CamionController;
   public static get instance(): CamionController {
     if (this._instance) {
@@ -23,6 +35,11 @@ class CamionController extends AbstractController {
   }
 
   private async getTest(req: Request, res: Response) {
+    /**
+    * Prueba de conexión con el controlador
+    * @param - None
+    * @returns - None
+    */
     try {
       res.status(200).send("Camion works");
     } catch (error) {
@@ -31,6 +48,17 @@ class CamionController extends AbstractController {
   }
 
   private async postCrear(req: Request, res: Response) {
+    /**
+     * Crea un nuevo camión en la base de datos.
+     * 
+     * @param {Request} req - Petición HTTP que contiene los datos del camión en `req.body`.
+     * @param {string} req.body.placas - Las placas del camión.
+     * @param {string} req.body.modelo - El modelo del camión.
+     * @param {string} req.body.idMongoLocalzacion - El ID de localización relacionado con MongoDB.
+     * @param {Response} res - Objeto de la respuesta HTTP utilizado para enviar la respuesta al cliente.
+     * @returns {Promise<void>} No devuelve ningún valor directamente. Envía una respuesta HTTP al cliente.
+     */
+
     try {
       const { placas, modelo, idMongoLocalzacion } = req.body;
       const camion = await db.Camion.create({
@@ -46,6 +74,13 @@ class CamionController extends AbstractController {
   }
 
   private async getTodos(req: Request, res: Response) {
+    /**
+     * Obtiene todos los camiones de la base de datos.
+     * 
+     * @param req - None.
+     * @returns {dict} - Diccionario con todos los camiones.
+     */
+
     try {
       const camiones = await db.Camion.findAll();
       res.status(200).json(camiones);
@@ -57,6 +92,13 @@ class CamionController extends AbstractController {
   }
 
   private async getPorId(req: Request, res: Response) {
+    /**
+     * Obtiene un camión de la base de datos por su ID.
+     * 
+     * @param req - Contiene el ID del camión en los parámetros de la URL.
+     * @returns {dict} - Diccionario con los detalles del camión, o un mensaje de error si no se encuentra.
+     */
+
     try {
       const { id } = req.params;
       const camion = await db.Camion.findByPk(id);
@@ -71,6 +113,13 @@ class CamionController extends AbstractController {
   }
 
   private async putActualizar(req: Request, res: Response) {
+    /**
+     * Actualiza un camión en la base de datos por su ID.
+     * 
+     * @param req - Contiene el ID del camión en los parámetros de la URL y los datos actualizados en el cuerpo de la petición.
+     * @returns {dict} - Diccionario con los detalles del camión actualizado o un mensaje de error si no se encuentra.
+     */
+
     try {
       const { id } = req.params;
       const { placas, modelo, idMongoLocalzacion } = req.body;
@@ -91,6 +140,13 @@ class CamionController extends AbstractController {
   }
 
   private async deletePorId(req: Request, res: Response) {
+    /**
+     * Elimina un camión de la base de datos por su ID.
+     * 
+     * @param req - Contiene el ID del camión en los parámetros de la URL.
+     * @returns {void} - No devuelve contenido si la eliminación es exitosa o un mensaje de error si no se encuentra.
+     */
+
     try {
       const { id } = req.params;
       const camion = await db.Camion.findByPk(id);

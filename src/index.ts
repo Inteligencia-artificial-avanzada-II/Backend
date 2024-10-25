@@ -29,7 +29,7 @@ const server = new Server({
     SalidaController.instance,
     UsuarioCasetaController.instance,
     UsuarioController.instance,
-    QrController.instance,
+    // QrController.instance,
   ],
 });
 

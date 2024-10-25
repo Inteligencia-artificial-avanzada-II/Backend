@@ -2,6 +2,7 @@
 import express from "express"; //TS
 import AbstractController from "../controllers/AbstractController";
 import db from "../models";
+import connectToMongoDb from "../models/NoSql";
 
 class Server {
   //Atributos de la clase
@@ -38,8 +39,17 @@ class Server {
     });
   }
 
+  // Conectar tanto a la base de datos SQL (Sequelize) como a MongoDB (NoSQL)
   private async connectDB() {
-    await db.sequelize.sync();
+    try {
+      // Conectar a la base de datos SQL usando Sequelize
+      await db.sequelize.sync();
+
+      // Conectar a MongoDB
+      await connectToMongoDb();
+    } catch (error) {
+      console.error("Error conectando a las bases de datos:", error);
+    }
   }
 
   public init() {

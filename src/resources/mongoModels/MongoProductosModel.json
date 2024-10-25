@@ -1,0 +1,50 @@
+[
+    {
+        "_id": "MongoID",
+        "orderNumber": "Columna Orden",
+        "createdBy": "Columna Crear usuario",
+        "modifiedBy": "Columna Usuario de modificacion",
+        "creationDate": "Columna Fecha de Creacion",
+        "products": [
+            {
+                "itemCode": "ART{Columna Articulo}",
+                "itemDescription": "Columna Descripcion de articulo",
+                "originalOrderQuantity": "Columna Cantidad de orden original",
+                "requestedQuantity": "Columna Cantidad solicitada",
+                "assignedQuantity": "Columna Cantidad asignada",
+                "packedQuantity": "Columna Cantidad empaquetada",
+                "orderDetailStatus": "Columna orderdtlstatus",
+                "expirationDateComprobante": "Columna Fecha de caducidad de comprobante",
+                "barcode": "Columna Codigo de barras de articulo",
+                "salePrice": "Columna Precio de venta",
+                "creationDateDetail": "Columna Fecha personalizada de detalle 5",
+                "alternativeItemCodes": "Columna Codigos de articulos alternativos",
+                "unitOfMeasure": "Columna Detalle de orden - Campo personalizado 1"
+            }
+        ]
+    },
+    {
+        "_id": "ObjectId",
+        "orderNumber": "string",
+        "createdBy": "string",
+        "modifiedBy": "string",
+        "creationDate": "Date",
+        "products": [
+            {
+                "itemCode": "string",
+                "itemDescription": "string",
+                "originalOrderQuantity": "number",
+                "requestedQuantity": "number",
+                "assignedQuantity": "number",
+                "packedQuantity": "number",
+                "orderDetailStatus": "string",
+                "expirationDateComprobante": "Date",
+                "barcode": "string",
+                "salePrice": "number",
+                "creationDateDetail": "Date",
+                "alternativeItemCodes": "string",
+                "unitOfMeasure": "string"
+            }
+        ]
+    }
+]

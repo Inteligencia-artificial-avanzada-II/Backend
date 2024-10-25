@@ -35,6 +35,11 @@ class QrController extends AbstractController {
   }
 
   private async getTest(req: Request, res: Response) {
+    /**
+    * Prueba de conexión con el controlador
+    * @param - None
+    * @returns - None
+    */
     try {
       res.status(200).send("Qr Works");
     } catch (error) {

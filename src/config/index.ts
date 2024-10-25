@@ -16,3 +16,4 @@ export const FINGERPRINT: string = process.env.FINGERPRINT || "";
 export const TENANCY: string = process.env.TENANCY || "";
 export const REGION: string = process.env.REGION || "";
 export const KEY_FILE: string = process.env.KEY_FILE || "";
+export const MONGO_DB: string = process.env.MONGO_DB || "";

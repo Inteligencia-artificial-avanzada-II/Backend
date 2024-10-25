@@ -3,6 +3,18 @@ import AbstractController from "./AbstractController";
 import db from "../models";
 
 class CedisController extends AbstractController {
+  /**
+   * Controlador para gestionar las operaciones relacionadas con los CEDIS en la base de datos.
+   * 
+   * * Métodos:
+   * @method getTest Prueba de conexión con el controlador.
+   * @method postCrear Crea un nuevo CEDIS en la base de datos.
+   * @method getTodos Obtiene todos los CEDIS almacenados.
+   * @method getPorId Obtiene un CEDIS por su ID.
+   * @method putActualizar Actualiza los detalles de un CEDIS por su ID.
+   * @method deletePorId Elimina un CEDIS de la base de datos por su ID.
+   */
+
   private static _instance: CedisController;
   public static get instance(): CedisController {
     if (this._instance) {
@@ -22,6 +34,11 @@ class CedisController extends AbstractController {
   }
 
   private async getTest(req: Request, res: Response) {
+    /**
+    * Prueba de conexión con el controlador
+    * @param - None
+    * @returns - None
+    */
     try {
       res.status(200).send("Cedis Works");
     } catch (error) {
@@ -30,6 +47,17 @@ class CedisController extends AbstractController {
   }
 
   private async postCrear(req: Request, res: Response) {
+    /**
+     * Crea un nuevo CEDIS en la base de datos.
+     * 
+     * @param {Request} req - Petición HTTP que contiene los datos del CEDIS en `req.body`.
+     * @param {string} req.body.name - El nombre del CEDIS.
+     * @param {string} req.body.address - La dirección del CEDIS.
+     * @param {string} req.body.phone - El número de teléfono del CEDIS.
+     * @returns {dict} - Diccionario con los detalles del CEDIS creado.
+     */
+
+
     try {
       const { name, address, phone } = req.body;
       const cedis = await db.Cedis.create({
@@ -45,6 +73,13 @@ class CedisController extends AbstractController {
   }
 
   private async getTodos(req: Request, res: Response) {
+    /**
+     * Obtiene todos los CEDIS de la base de datos.
+     * 
+     * @param req - None.
+     * @returns {dict} - Diccionario con todos los CEDIS.
+     */
+
     try {
       const cedis = await db.Cedis.findAll();
       res.status(200).json(cedis);
@@ -54,6 +89,13 @@ class CedisController extends AbstractController {
   }
 
   private async getPorId(req: Request, res: Response) {
+    /**
+     * Obtiene un CEDIS de la base de datos por su ID.
+     * 
+     * @param req - Contiene el ID del CEDIS en los parámetros de la URL.
+     * @returns {dict} - Diccionario con los detalles del CEDIS, o un mensaje de error si no se encuentra.
+     */
+
     try {
       const { id } = req.params;
       const cedis = await db.Cedis.findByPk(id);
@@ -68,6 +110,13 @@ class CedisController extends AbstractController {
   }
 
   private async putActualizar(req: Request, res: Response) {
+    /**
+     * Actualiza un CEDIS en la base de datos por su ID.
+     * 
+     * @param req - Contiene el ID del CEDIS en los parámetros de la URL y los datos actualizados en el cuerpo de la petición.
+     * @returns {dict} - Diccionario con los detalles del CEDIS actualizado o un mensaje de error si no se encuentra.
+     */
+
     try {
       const { id } = req.params;
       const { name, address, phone } = req.body;
@@ -87,6 +136,13 @@ class CedisController extends AbstractController {
   }
 
   private async deletePorId(req: Request, res: Response) {
+    /**
+     * Elimina un CEDIS de la base de datos por su ID.
+     * 
+     * @param req - Contiene el ID del CEDIS en los parámetros de la URL.
+     * @returns {dict} - Diccionario vacío si la eliminación es exitosa o un mensaje de error si no se encuentra.
+     */
+
     try {
       const { id } = req.params;
       const cedis = await db.Cedis.findByPk(id);
