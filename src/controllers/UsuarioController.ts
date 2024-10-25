@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import AbstractController from "./AbstractController";
 import db from "../models";
-import { createJWT, validateJWT } from "../utils/jwt";
+import { createJWT, validateJWT, createJWTAdmin } from "../utils/jwt";
 import { validateTokenMiddleware } from "../middlewares/validateToken"
 
 class UsuarioController extends AbstractController {
@@ -23,6 +23,7 @@ class UsuarioController extends AbstractController {
     this.router.delete("/eliminar/:id", this.deletePorId.bind(this));
     this.router.post("/login", this.postLogin.bind(this));
     this.router.post("/validatoken", this.postValidaToken.bind(this))
+    this.router.post("/admintoken", this.postTokenSinExpiracion.bind(this))
   }
 
   private async getTest(req: Request, res: Response) {
@@ -178,6 +179,28 @@ class UsuarioController extends AbstractController {
       // Manejo del error para que no se corte el backend
       console.error('Error en el controlador:', err);
       return res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  }
+
+  private async postTokenSinExpiracion(req: Request, res: Response) {
+    try {
+      const { userName, contraseña } = req.body;
+      const usuario = await db.Usuario.findOne({ where: { userName } });
+      const idUsuario = usuario.idUsuario;
+      const rolUsuario = usuario.rol;
+      if (!usuario) {
+        res.status(404).json({ message: "Las credenciales ingresadas son incorrectas", data: {} });
+        return;
+      }
+      const isPasswordValid = await usuario.validatePassword(contraseña);
+      if (!isPasswordValid) {
+        res.status(401).json({ message: "Las credenciales ingresadas son incorrectas", data: {} });
+        return;
+      }
+      const token = createJWTAdmin({ idUsuario: idUsuario, rolUsuario: rolUsuario })
+      res.status(200).json({ message: "Datos validados exitosamente", data: { isValid: true, token: token } });
+    } catch (error) {
+      res.status(500).send(`Error al hacer login: ${error}`);
     }
   }
 }

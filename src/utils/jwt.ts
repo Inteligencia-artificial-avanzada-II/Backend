@@ -8,6 +8,11 @@ export const createJWT = (payload: object): string => {
     return jwt.sign(payload, SECRET_KEY, { expiresIn: '4h' }); // Token válido por 1 hora
 };
 
+// Función para crear un JWT sin expiración
+export const createJWTAdmin = (payload: object): string => {
+    return jwt.sign(payload, SECRET_KEY); // Token sin expiración
+};
+
 // Función para validar un JWT y devolver el token decodificado o null si es inválido
 export const validateJWT = (token: string): JwtPayload | null => {
     try {
