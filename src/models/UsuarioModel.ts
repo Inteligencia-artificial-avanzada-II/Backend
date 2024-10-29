@@ -1,5 +1,6 @@
 import { Model, Sequelize } from "sequelize";
 import bcrypt from "bcrypt";
+import { CATALOGO_ROL_USUARIO   } from "../catalogs/modelsSqlCatalogs"
 
 // Interfaz que define los atributos del modelo Usuario
 interface UsuarioAttributes {
@@ -59,6 +60,9 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       rol: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          isIn: [Object.values(CATALOGO_ROL_USUARIO)]
+        }
       },
     },
     {
