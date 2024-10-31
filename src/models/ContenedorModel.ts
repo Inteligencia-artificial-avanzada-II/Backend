@@ -4,10 +4,11 @@ import bcrypt from "bcrypt";
 // Interfaz que define los atributos del modelo Contenedor
 interface ContenedorAttributes {
   idContenedor: number;
-  userNaname: string;
+  userName: string;
   capacidad: number;
   contraseña: string;
   tipo: string;
+  status: string;
 }
 
 // Exporta una función que define el modelo Contenedor
@@ -17,10 +18,11 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     implements ContenedorAttributes
   {
     public idContenedor!: number;
-    public userNaname!: string;
+    public userName!: string;
     public capacidad!: number;
     public contraseña!: string;
     public tipo!: string;
+    public status!: string;
   }
 
   Contenedor.init(
@@ -30,7 +32,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
         autoIncrement: true,
         primaryKey: true,
       },
-      userNaname: {
+      userName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -43,6 +45,10 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
         allowNull: false,
       },
       tipo: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      status: {
         type: DataTypes.STRING,
         allowNull: false,
       },

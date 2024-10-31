@@ -122,7 +122,10 @@ class ContenedorController extends AbstractController {
       }
       const isPasswordValid = await contenedor.validatePassword(contraseña);
       if (!isPasswordValid) {
-        res.status(404).send("Las credenciales ingresadas son incorrectas");
+        res.status(404).json({
+          message: "Las credenciales ingresadas son incorrectas",
+          data: {},
+        });
         return;
       }
       const token = createJWT({

@@ -6,6 +6,7 @@ interface CamionAttributes {
   placas: string;
   modelo: string;
   idMongoLocalzacion: string;
+  isOccupied: boolean;
 }
 
 // Exporta una función que define el modelo Camion
@@ -15,6 +16,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public placas!: string;
     public modelo!: string;
     public idMongoLocalzacion!: string;
+    public isOccupied!: boolean;
   }
 
   Camion.init(
@@ -34,6 +36,10 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       },
       idMongoLocalzacion: {
         type: DataTypes.STRING,
+        allowNull: false,
+      },
+      isOccupied: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
     },
