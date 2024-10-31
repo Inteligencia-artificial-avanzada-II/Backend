@@ -41,12 +41,13 @@ class ContenedorController extends AbstractController {
 
   private async postCrear(req: Request, res: Response) {
     try {
-      const { userName, capacidad, contraseña, tipo } = req.body;
+      const { userName, capacidad, contraseña, tipo, status } = req.body;
       const contenedor = await db.Contenedor.create({
         userName,
         capacidad,
         contraseña,
         tipo,
+        status,
       });
 
       res.status(201).send(contenedor);

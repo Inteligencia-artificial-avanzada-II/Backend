@@ -23,6 +23,11 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public contraseña!: string;
     public tipo!: string;
     public status!: string;
+
+    // Método para comparar la contraseña ingresada con el hash almacenado
+    public async validatePassword(contraseña: string): Promise<boolean> {
+      return bcrypt.compare(contraseña, this.contraseña);
+    }
   }
 
   Contenedor.init(
