@@ -5,7 +5,6 @@ interface CamionAttributes {
   idCamion: number;
   placas: string;
   modelo: string;
-  idMongoLocalzacion: string;
   isOccupied: boolean;
 }
 
@@ -15,7 +14,6 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public idCamion!: number;
     public placas!: string;
     public modelo!: string;
-    public idMongoLocalzacion!: string;
     public isOccupied!: boolean;
   }
 
@@ -31,10 +29,6 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
         allowNull: false,
       },
       modelo: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      idMongoLocalzacion: {
         type: DataTypes.STRING,
         allowNull: false,
       },

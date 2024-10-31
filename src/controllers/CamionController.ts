@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 import AbstractController from "./AbstractController";
 import db from "../models";
-import { afterEach } from "node:test";
 
 class CamionController extends AbstractController {
   /**
    * Controlador para gestionar las operaciones relacionadas con camiones en la base de datos.
-   * 
+   *
    * * Métodos:
    * @method getTest Prueba de conexión con el controlador.
    * @method postCrear Crea un nuevo camión en la base de datos.
@@ -30,16 +29,18 @@ class CamionController extends AbstractController {
     this.router.post("/crear", this.postCrear.bind(this));
     this.router.get("/consultarTodos", this.getTodos.bind(this));
     this.router.get("/consultar/:id", this.getPorId.bind(this));
+    this.router.get("/disponibles", this.getDisponibles.bind(this));
+    this.router.get("/noDisponibles", this.getNotDisponibles.bind(this));
     this.router.put("/actualizar/:id", this.putActualizar.bind(this));
     this.router.delete("/eliminar/:id", this.deletePorId.bind(this));
   }
 
   private async getTest(req: Request, res: Response) {
     /**
-    * Prueba de conexión con el controlador
-    * @param - None
-    * @returns - None
-    */
+     * Prueba de conexión con el controlador
+     * @param - None
+     * @returns - None
+     */
     try {
       res.status(200).send("Camion works");
     } catch (error) {
@@ -50,7 +51,7 @@ class CamionController extends AbstractController {
   private async postCrear(req: Request, res: Response) {
     /**
      * Crea un nuevo camión en la base de datos.
-     * 
+     *
      * @param {Request} req - Petición HTTP que contiene los datos del camión en `req.body`.
      * @param {string} req.body.placas - Las placas del camión.
      * @param {string} req.body.modelo - El modelo del camión.
@@ -76,7 +77,7 @@ class CamionController extends AbstractController {
   private async getTodos(req: Request, res: Response) {
     /**
      * Obtiene todos los camiones de la base de datos.
-     * 
+     *
      * @param req - None.
      * @returns {dict} - Diccionario con todos los camiones.
      */
@@ -94,7 +95,7 @@ class CamionController extends AbstractController {
   private async getPorId(req: Request, res: Response) {
     /**
      * Obtiene un camión de la base de datos por su ID.
-     * 
+     *
      * @param req - Contiene el ID del camión en los parámetros de la URL.
      * @returns {dict} - Diccionario con los detalles del camión, o un mensaje de error si no se encuentra.
      */
@@ -112,10 +113,54 @@ class CamionController extends AbstractController {
     }
   }
 
+  private async getDisponibles(req: Request, res: Response) {
+    /**
+     * Obtiene todos los camiones disponibles de la base de datos.
+     *
+     * @param req - None.
+     * @returns {dict} - Diccionario con todos los camiones disponibles.
+     */
+
+    try {
+      const camiones = await db.Camion.findAll({
+        where: {
+          isOccupied: false,
+        },
+      });
+      res.status(200).json(camiones);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: `Error al consultar los Camiones: ${error}` });
+    }
+  }
+
+  private async getNotDisponibles(req: Request, res: Response) {
+    /**
+     * Obtiene todos los camiones no disponibles de la base de datos.
+     *
+     * @param req - None.
+     * @returns {dict} - Diccionario con todos los camiones no disponibles.
+     */
+
+    try {
+      const camiones = await db.Camion.findAll({
+        where: {
+          isOccupied: true,
+        },
+      });
+      res.status(200).json(camiones);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: `Error al consultar los Camiones: ${error}` });
+    }
+  }
+
   private async putActualizar(req: Request, res: Response) {
     /**
      * Actualiza un camión en la base de datos por su ID.
-     * 
+     *
      * @param req - Contiene el ID del camión en los parámetros de la URL y los datos actualizados en el cuerpo de la petición.
      * @returns {dict} - Diccionario con los detalles del camión actualizado o un mensaje de error si no se encuentra.
      */
@@ -142,7 +187,7 @@ class CamionController extends AbstractController {
   private async deletePorId(req: Request, res: Response) {
     /**
      * Elimina un camión de la base de datos por su ID.
-     * 
+     *
      * @param req - Contiene el ID del camión en los parámetros de la URL.
      * @returns {void} - No devuelve contenido si la eliminación es exitosa o un mensaje de error si no se encuentra.
      */
