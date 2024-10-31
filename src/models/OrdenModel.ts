@@ -8,6 +8,7 @@ interface OrdenAttributes {
   origen: string;
   idCedis: number;
   idMongoProductos: string;
+  isActive: boolean;
 }
 
 // Exporta una función que define el modelo Orden
@@ -19,6 +20,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public origen!: string;
     public idCedis!: number;
     public idMongoProductos!: string;
+    public isActive!: boolean;
 
     // Relaciòn de pertenencia con el modelo Contenedor
     static associate(models: any) {
@@ -59,6 +61,10 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       },
       idMongoProductos: {
         type: DataTypes.STRING,
+        allowNull: false,
+      },
+      isActive: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
     },
