@@ -16,14 +16,47 @@ class ContenedorController extends AbstractController {
 
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
-    this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
-    this.router.get("/consultarTodos", validateTokenMiddleware, this.getTodos.bind(this));
-    this.router.get("/consultar/:id", validateTokenMiddleware, this.getPorId.bind(this));
-    this.router.put("/actualizar/:id", validateTokenMiddleware, this.putActualizar.bind(this));
-    this.router.delete("/eliminar/:id", validateTokenMiddleware, this.deletePorId.bind(this));
+    this.router.post(
+      "/crear",
+      validateTokenMiddleware,
+      this.postCrear.bind(this)
+    );
+    this.router.get(
+      "/consultarTodos",
+      validateTokenMiddleware,
+      this.getTodos.bind(this)
+    );
+    this.router.get(
+      "/disponibles",
+      validateTokenMiddleware,
+      this.getDisponibles.bind(this)
+    );
+    this.router.get(
+      "/consultar/:id",
+      validateTokenMiddleware,
+      this.getPorId.bind(this)
+    );
+    this.router.put(
+      "/actualizar/:id",
+      validateTokenMiddleware,
+      this.putActualizar.bind(this)
+    );
+    this.router.delete(
+      "/eliminar/:id",
+      validateTokenMiddleware,
+      this.deletePorId.bind(this)
+    );
     this.router.post("/login", this.postLogin.bind(this));
-    this.router.post("/validatoken", validateTokenMiddleware, this.postValidaToken.bind(this));
-    this.router.post("/admintoken", validateTokenMiddleware, this.postTokenSinExpiracion.bind(this));
+    this.router.post(
+      "/validatoken",
+      validateTokenMiddleware,
+      this.postValidaToken.bind(this)
+    );
+    this.router.post(
+      "/admintoken",
+      validateTokenMiddleware,
+      this.postTokenSinExpiracion.bind(this)
+    );
   }
 
   private async getTest(req: Request, res: Response) {
@@ -59,6 +92,19 @@ class ContenedorController extends AbstractController {
   private async getTodos(req: Request, res: Response) {
     try {
       const contenedores = await db.Contenedor.findAll();
+      res.status(200).json(contenedores);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: `Error al consultar los Contenedores: ${error}` });
+    }
+  }
+
+  private async getDisponibles(req: Request, res: Response) {
+    try {
+      const contenedores = await db.Contenedor.findAll({
+        where: { status: "Disponible" },
+      });
       res.status(200).json(contenedores);
     } catch (error) {
       res

@@ -1,0 +1,35 @@
+{
+  "_id": "ObjectId",
+  "fosas": [
+    {
+      "name": "Fosa 1",
+      "description": "Fosa 1 description",
+      "capacity": 10,
+      "created_at": "2020-08-20T00:00:00.000Z",
+      "updated_at": "2020-08-20T00:00:00.000Z",
+      "daily": {
+        "fecha": {
+          "contenedorId": true
+        },
+        "fecha2": {
+          "contenedorId": true
+        }
+      }
+    },
+    {
+      "name": "Fosa 2",
+      "description": "Fosa 2 description",
+      "capacity": 10,
+      "created_at": "2020-08-20T00:00:00.000Z",
+      "updated_at": "2020-08-20T00:00:00.000Z",
+      "daily": {
+        "fecha": {
+          "contenedorId": true
+        },
+        "fecha2": {
+          "contenedorId": true
+        }
+      }
+    }
+  ]
+}

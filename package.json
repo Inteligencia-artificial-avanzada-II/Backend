@@ -35,6 +35,8 @@
     "oci-sdk": "^2.96.0",
     "qrcode": "^1.5.4",
     "sequelize": "^6.37.3",
+    "sequelize-auto-migrations": "^1.0.3",
+    "sequelize-cli": "^6.6.2",
     "twilio": "^5.1.0"
   },
   "devDependencies": {
