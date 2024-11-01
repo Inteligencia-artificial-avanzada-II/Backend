@@ -157,11 +157,8 @@ class UsuarioController extends AbstractController {
         });
         return;
       }
-      const token = createJWT({ idUsuario: idUsuario, rolUsuario: rolUsuario });
-      res.status(200).json({
-        message: "Datos validados exitosamente",
-        data: { isValid: true, token: token },
-      });
+      const token = createJWT({ idUsuario: idUsuario, rolUsuario: rolUsuario })
+      res.status(200).json({ message: "Datos validados exitosamente", data: { isValid: true, token: token, rolUsuario: rolUsuario } });
     } catch (error) {
       res.status(500).send(`Error al hacer login: ${error}`);
     }

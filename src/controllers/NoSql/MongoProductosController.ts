@@ -1,16 +1,22 @@
 import { Request, Response } from "express";
-import AbstractNoSqlController from "./AbstractNoSqlController";
 import { MongoProductosModel, Order } from "../../models/NoSql/MongoProductosModel";  // Importamos la interfaz Order también
+import AbstractController from "../AbstractController";
 
-class MongoProductosController extends AbstractNoSqlController<Order> {  // Cambiamos 'typeof OrderModel' a 'Order'
+class MongoProductosController extends AbstractController {  // Cambiamos 'typeof OrderModel' a 'Order'
     private static _instance: MongoProductosController;
+    private model = MongoProductosModel;
 
     public static get instance(): MongoProductosController {
         if (this._instance) {
             return this._instance;
         }
-        this._instance = new MongoProductosController("orden", MongoProductosModel);
+        this._instance = new MongoProductosController("ordenmongo");
         return this._instance;
+    }
+
+    constructor(name: string) {
+        super(name);
+        this.model = MongoProductosModel;  // Asignación del modelo MongoProductosModel
     }
 
     protected initializeRoutes(): void {
@@ -22,6 +28,7 @@ class MongoProductosController extends AbstractNoSqlController<Order> {  // Camb
         this.router.delete("/eliminar/:id", this.deletePorId.bind(this));
     }
 
+    // Métodos privados
     private async getTest(req: Request, res: Response) {
         /**
         * Prueba de conexión con el controlador
@@ -29,11 +36,12 @@ class MongoProductosController extends AbstractNoSqlController<Order> {  // Camb
         * @returns - None
         */
         try {
-            res.status(200).send("Orden works");
+            res.status(200).send("Orden Mongo works");
         } catch (error) {
             res.status(500).send(`Error al conectar con la Orden: ${error}`);
         }
     }
+
     private async postCrear(req: Request, res: Response) {
         try {
             // Obtenemos los datos del cuerpo de la petición
@@ -112,6 +120,23 @@ class MongoProductosController extends AbstractNoSqlController<Order> {  // Camb
             res.status(204).send();
         } catch (error) {
             res.status(500).send(`Error al eliminar la Orden: ${error}`);
+        }
+    }
+
+    // Métodos públicos
+    public async createOrder(data: Order): Promise<Order & { _id: string }> {
+        const newOrder = new this.model(data);
+        const savedOrder = await newOrder.save();
+        return savedOrder as Order & { _id: string };
+    }
+
+    public async getOrderById(id: string): Promise<Order | null> {
+        try {
+            const order = await this.model.findById(id).select('-__v -_id').exec();
+            return order;
+        } catch (error) {
+            console.error("Error obteniendo la orden por ID:", error);
+            return null;
         }
     }
 }

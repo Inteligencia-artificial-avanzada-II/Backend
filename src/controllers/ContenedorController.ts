@@ -15,15 +15,15 @@ class ContenedorController extends AbstractController {
   }
 
   protected initializeRoutes(): void {
-    this.router.get("/test", this.getTest.bind(this));
-    this.router.post("/crear", this.postCrear.bind(this));
-    this.router.get("/consultarTodos", this.getTodos.bind(this));
-    this.router.get("/consultar/:id", this.getPorId.bind(this));
-    this.router.put("/actualizar/:id", this.putActualizar.bind(this));
-    this.router.delete("/eliminar/:id", this.deletePorId.bind(this));
+    this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
+    this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
+    this.router.get("/consultarTodos", validateTokenMiddleware, this.getTodos.bind(this));
+    this.router.get("/consultar/:id", validateTokenMiddleware, this.getPorId.bind(this));
+    this.router.put("/actualizar/:id", validateTokenMiddleware, this.putActualizar.bind(this));
+    this.router.delete("/eliminar/:id", validateTokenMiddleware, this.deletePorId.bind(this));
     this.router.post("/login", this.postLogin.bind(this));
-    this.router.post("/validatoken", this.postValidaToken.bind(this));
-    this.router.post("/admintoken", this.postTokenSinExpiracion.bind(this));
+    this.router.post("/validatoken", validateTokenMiddleware, this.postValidaToken.bind(this));
+    this.router.post("/admintoken", validateTokenMiddleware, this.postTokenSinExpiracion.bind(this));
   }
 
   private async getTest(req: Request, res: Response) {

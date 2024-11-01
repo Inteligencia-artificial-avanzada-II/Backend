@@ -4,8 +4,8 @@ import { JwtPayload } from 'jsonwebtoken';
 
 // Middleware para validar el JWT
 export const validateTokenMiddleware = (req: Request, res: Response, next: NextFunction): Response | void => {
-    console.log(req.headers)
-    const token = req.headers['authorization']?.split(' ')[1]; // Suponiendo que el token viene en formato 'Bearer <token>'
+    const authorizationHeader = req.headers['authorization'];
+    const token = Array.isArray(authorizationHeader) ? authorizationHeader[0]?.split('Token ')[1] : authorizationHeader?.split('Token ')[1];
 
     if (!token) {
         return res.status(401).json({ message: 'No token provided', data: {} });
