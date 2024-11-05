@@ -22,6 +22,7 @@ class OrdenController extends AbstractController {
     this.router.get("/consultarqr/:id", this.getPorIdCodigoQr.bind(this));
     this.router.put("/actualizar/:id", this.putActualizar.bind(this));
     this.router.delete("/eliminar/:id", this.deletePorId.bind(this));
+    this.router.get("consularQrUrl/:id", this.getQrUrl.bind(this));
   }
 
   private async getTest(req: Request, res: Response) {
@@ -223,6 +224,38 @@ class OrdenController extends AbstractController {
       res.status(204).send();
     } catch (error) {
       res.status(500).send(`Error al eliminar la Orden: ${error}`);
+    }
+  }
+
+  private async getQrUrl(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      // Busca todas las órdenes activas con el ID dado
+      const ordenesActivas = await db.Orden.findAll({
+        where: {
+          id,
+          isActive: true,
+        },
+      });
+
+      // Verifica si no existen órdenes activas
+      if (ordenesActivas.length === 0) {
+        return res
+          .status(404)
+          .send("No hay órdenes activas para el ID proporcionado.");
+      }
+
+      // Si existen varias órdenes activas, selecciona la de mayor valor (primer resultado)
+      const ordenMayorValor = ordenesActivas[0];
+
+      // Devuelve la URL o los datos de la orden de mayor valor
+      res.status(200).json({
+        message: "Orden activa encontrada",
+        data: ordenMayorValor,
+      });
+    } catch (error) {
+      res.status(500).send(`Error al consultar las órdenes activas: ${error}`);
     }
   }
 }
