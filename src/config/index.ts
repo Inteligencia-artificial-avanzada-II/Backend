@@ -17,3 +17,6 @@ export const TENANCY: string = process.env.TENANCY || "";
 export const REGION: string = process.env.REGION || "";
 export const KEY_FILE: string = process.env.KEY_FILE || "";
 export const MONGO_DB: string = process.env.MONGO_DB || "";
+export const BUCKET_NAMESPACE: string = process.env.BUCKET_NAMESPACE || "";
+export const BUCKET_NAME: string = process.env.BUCKET_NAME || "";
+export const QR_KEY: string = process.env.SECRET_SAVE_QR_KEY || "";

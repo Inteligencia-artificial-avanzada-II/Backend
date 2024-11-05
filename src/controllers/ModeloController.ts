@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import AbstractController from "./AbstractController";
 import db from "../models";
+import { validateTokenMiddleware } from "../middlewares/validateToken";
 
 class ModeloController extends AbstractController {
   private static _instance: ModeloController;
@@ -13,7 +14,7 @@ class ModeloController extends AbstractController {
   }
 
   protected initializeRoutes(): void {
-    this.router.get("/test", this.getTest.bind(this));
+    this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
   }
 
   private async getTest(req: Request, res: Response) {

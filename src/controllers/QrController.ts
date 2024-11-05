@@ -5,6 +5,7 @@ import fs from "fs";
 import QRCode from "qrcode";
 import { ConfigFileAuthenticationDetailsProvider } from "oci-common";
 import { ObjectStorageClient, requests } from "oci-objectstorage";
+import { BUCKET_NAME, BUCKET_NAMESPACE, QR_KEY } from "../config";
 
 class QrController extends AbstractController {
   private static _instance: QrController;
@@ -21,12 +22,8 @@ class QrController extends AbstractController {
     authenticationDetailsProvider: this.provider,
   });
 
-  private namespace = "axnhu2vnql31";
-  private bucketName = "qrprueba";
-  private objectName = "image4.png";
-  // private filePath = path.resolve(
-  //   "/Users/marcocm/Desktop/03_ESCUELA/02_Universidad/07/RetoII/App/assets/bimboLogo.png"
-  // );
+  private namespace = BUCKET_NAMESPACE;
+  private bucketName = BUCKET_NAME;
 
   protected initializeRoutes(): void {
     this.router.get("/test", this.getTest.bind(this));
@@ -141,6 +138,35 @@ class QrController extends AbstractController {
     } catch (error) {
       console.error("Error al generar o subir el código QR:", error);
       res.status(500).send("Error al generar o subir el código QR.");
+    }
+  }
+
+  public async postCrearYSubirPublic(text: string, res: Response) {
+    try {
+
+      if (!text) { 
+        return true 
+      }
+
+      // Genera el código QR como un Buffer
+      const qrCodeBuffer = await QRCode.toBuffer(text);
+
+      // Configuración para la solicitud de subida
+      const putObjectRequest = {
+        bucketName: this.bucketName,
+        namespaceName: this.namespace,
+        objectName: `${QR_KEY}-${text}.png`, // Nombre único del objeto en el bucket
+        putObjectBody: qrCodeBuffer,
+        contentLength: qrCodeBuffer.length,
+      };
+
+      // Sube el archivo directamente al bucket
+      const putObject = await this.client.putObject(putObjectRequest);
+
+      // Envía una respuesta con confirmación
+      return true
+    } catch (error) {
+      return false
     }
   }
 }

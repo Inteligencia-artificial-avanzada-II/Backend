@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import AbstractController from "./AbstractController";
 import db from "../models";
 import MongoProductosController from "./NoSql/MongoProductosController";
-import { or } from "sequelize";
+import QrController from "./QrController";
+import { toString } from "qrcode";
+import { validateTokenMiddleware } from "../middlewares/validateToken";
+import UsuarioController from "./UsuarioController";
+import { validateJWT } from "../utils/jwt";
 
 class OrdenController extends AbstractController {
   private static _instance: OrdenController;
@@ -15,14 +19,14 @@ class OrdenController extends AbstractController {
   }
 
   protected initializeRoutes(): void {
-    this.router.get("/test", this.getTest.bind(this));
-    this.router.post("/crear", this.postCrear.bind(this));
-    this.router.get("/consultarTodos", this.getTodos.bind(this));
-    this.router.get("/consultar/:id", this.getPorId.bind(this));
-    this.router.get("/consultarqr/:id", this.getPorIdCodigoQr.bind(this));
-    this.router.put("/actualizar/:id", this.putActualizar.bind(this));
-    this.router.delete("/eliminar/:id", this.deletePorId.bind(this));
-    this.router.get("consularQrUrl/:id", this.getQrUrl.bind(this));
+    this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
+    this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
+    this.router.get("/consultarTodos", validateTokenMiddleware, this.getTodos.bind(this));
+    this.router.get("/consultar/:id", validateTokenMiddleware, this.getPorId.bind(this));
+    this.router.get("/consultarqr/:id", validateTokenMiddleware, this.getPorIdCodigoQr.bind(this));
+    this.router.put("/actualizar/:id", validateTokenMiddleware, this.putActualizar.bind(this));
+    this.router.delete("/eliminar/:id", validateTokenMiddleware, this.deletePorId.bind(this));
+    this.router.get("/consultarQrUrl/:id", validateTokenMiddleware, this.getQrUrl.bind(this));
   }
 
   private async getTest(req: Request, res: Response) {
@@ -87,16 +91,8 @@ class OrdenController extends AbstractController {
       const productRequiredFields = [
         "itemCode",
         "itemDescription",
-        "originalOrderQuantity",
         "requestedQuantity",
-        "assignedQuantity",
-        "packedQuantity",
-        "orderDetailStatus",
-        "expirationDateComprobante",
-        "barcode",
         "salePrice",
-        "alternativeItemCodes",
-        "unitOfMeasure",
       ];
 
       for (const product of mongoData.products) {
@@ -110,6 +106,21 @@ class OrdenController extends AbstractController {
           }
         }
       }
+
+      const jwtDecoded = await validateJWT(mongoData.createdBy)
+      const idUser = jwtDecoded ? jwtDecoded.idUsuario : null
+      if (!idUser){
+        res.json({message: "El token enviado no es válido", data: {}})
+      }
+      const userInstance = UsuarioController.instance;
+      const userId = await userInstance.getPublicPorId(idUser)
+
+      if (!userId){
+        res.json({message: "El usuario no fue encontrado", data: {}})
+      }
+
+      mongoData.createdBy = userId
+      mongoData.modifiedBy = userId
 
       // Crear la orden en MongoDB usando el controlador
       const mongoController = MongoProductosController.instance;
@@ -125,10 +136,14 @@ class OrdenController extends AbstractController {
         idMongoProductos: mongoOrder._id.toString(), // Guardamos el ID de MongoDB en SQL
       });
 
+      const instanceQrController = QrController.instance;
+
+      const qrCodeResponse = await instanceQrController.postCrearYSubirPublic(orden.idOrden.toString(), res)
+
       // Respuesta con las órdenes creadas en SQL y MongoDB
       res.status(201).send({
         message: "Orden generada exitosamente",
-        data: { sqlOrden: orden, mongoOrden: mongoOrder },
+        data: { sqlOrden: orden, mongoOrden: mongoOrder, qrCode: qrCodeResponse },
       });
     } catch (error) {
       res.status(500).send(`Error al crear la Orden: ${error}`);
@@ -234,10 +249,13 @@ class OrdenController extends AbstractController {
       // Busca todas las órdenes activas con el ID dado
       const ordenesActivas = await db.Orden.findAll({
         where: {
-          id,
+          idContenedor: id,
           isActive: true,
         },
+        order: [["idOrden", "DESC"]]
       });
+
+      console.log(ordenesActivas)
 
       // Verifica si no existen órdenes activas
       if (ordenesActivas.length === 0) {

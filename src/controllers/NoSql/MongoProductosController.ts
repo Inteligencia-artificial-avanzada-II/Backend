@@ -71,7 +71,6 @@ class MongoProductosController extends AbstractController {  // Cambiamos 'typeo
         }
     }
 
-
     private async getTodos(req: Request, res: Response) {
         try {
             const orders = await this.model.find();

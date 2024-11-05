@@ -3,8 +3,6 @@ import AbstractController from "./AbstractController";
 import db from "../models";
 import { createJWT, validateJWT, createJWTAdmin } from "../utils/jwt";
 import { validateTokenMiddleware } from "../middlewares/validateToken";
-import { where } from "sequelize";
-import { isValid } from "date-fns";
 
 class UsuarioController extends AbstractController {
   private static _instance: UsuarioController;
@@ -18,15 +16,15 @@ class UsuarioController extends AbstractController {
 
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
-    this.router.post("/crear", this.postCrear.bind(this));
-    this.router.get("/consultarTodos", this.getTodos.bind(this));
-    this.router.get("/consultar/:id", this.getPorId.bind(this));
-    this.router.put("/actualizar/:id", this.putActualizar.bind(this));
-    this.router.delete("/eliminar/:id", this.deletePorId.bind(this));
+    this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
+    this.router.get("/consultarTodos", validateTokenMiddleware, this.getTodos.bind(this));
+    this.router.get("/consultar/:id", validateTokenMiddleware, this.getPorId.bind(this));
+    this.router.put("/actualizar/:id", validateTokenMiddleware, this.putActualizar.bind(this));
+    this.router.delete("/eliminar/:id", validateTokenMiddleware, this.deletePorId.bind(this));
     this.router.post("/login", this.postLogin.bind(this));
     this.router.post("/validatoken", this.postValidaToken.bind(this));
-    this.router.post("/admintoken", this.postTokenSinExpiracion.bind(this));
-    this.router.post("/loginCaseta", this.postLoginCaseta.bind(this));
+    this.router.post("/admintoken", validateTokenMiddleware, this.postTokenSinExpiracion.bind(this));
+    this.router.post("/loginCaseta", validateTokenMiddleware, this.postLoginCaseta.bind(this));
   }
 
   private async getTest(req: Request, res: Response) {
@@ -272,6 +270,16 @@ class UsuarioController extends AbstractController {
       });
     } catch (error) {
       res.status(500).send(`Error al hacer login: ${error}`);
+    }
+  }
+
+  public async getPublicPorId(id: number): Promise<number | null> {
+    try {
+      const usuario = await db.Usuario.findByPk(id);
+      return usuario ? usuario.dataValues.idUsuario : null; // Devuelve solo el id si se encuentra, o null si no
+    } catch (error) {
+      console.error(`Error al consultar el Usuario: ${error}`);
+      return null; // Devuelve null en caso de error
     }
   }
 }

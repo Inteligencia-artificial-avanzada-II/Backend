@@ -10,6 +10,9 @@ import {
   TENANCY,
   REGION,
   KEY_FILE,
+  QR_KEY,
+  BUCKET_NAMESPACE,
+  BUCKET_NAME,
 } from "./index";
 
 export default {
@@ -21,6 +24,9 @@ export default {
     dialect: "mysql",
     secretKey: SECRET_KEY,
     mongoDb: MONGO_DB,
+    qrKey: QR_KEY,
+    bucketName: BUCKET_NAME,
+    bucketNameSpace: BUCKET_NAMESPACE,
   },
   test: {
     username: "root",
@@ -30,6 +36,9 @@ export default {
     dialect: "mysql",
     secretKey: SECRET_KEY,
     mongoDb: MONGO_DB,
+    qrKey: QR_KEY,
+    bucketName: BUCKET_NAME,
+    bucketNameSpace: BUCKET_NAMESPACE,
   },
   production: {
     username: "root",
@@ -39,6 +48,9 @@ export default {
     dialect: "mysql",
     secretKey: SECRET_KEY,
     mongoDb: MONGO_DB,
+    qrKey: QR_KEY,
+    bucketName: BUCKET_NAME,
+    bucketNameSpace: BUCKET_NAMESPACE,
   },
   oracle: {
     user: USER,

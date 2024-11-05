@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import AbstractController from "./AbstractController";
 import db from "../models";
+import { validateTokenMiddleware } from "../middlewares/validateToken";
 
 class CedisController extends AbstractController {
   /**
@@ -25,12 +26,12 @@ class CedisController extends AbstractController {
   }
 
   protected initializeRoutes(): void {
-    this.router.get("/test", this.getTest.bind(this));
-    this.router.post("/crear", this.postCrear.bind(this));
-    this.router.get("/consultarTodos", this.getTodos.bind(this));
-    this.router.get("/consultar/:id", this.getPorId.bind(this));
-    this.router.put("/actualizar/:id", this.putActualizar.bind(this));
-    this.router.delete("/eliminar/:id", this.deletePorId.bind(this));
+    this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
+    this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
+    this.router.get("/consultarTodos", validateTokenMiddleware, this.getTodos.bind(this));
+    this.router.get("/consultar/:id", validateTokenMiddleware, this.getPorId.bind(this));
+    this.router.put("/actualizar/:id", validateTokenMiddleware, this.putActualizar.bind(this));
+    this.router.delete("/eliminar/:id", validateTokenMiddleware, this.deletePorId.bind(this));
   }
 
   private async getTest(req: Request, res: Response) {
