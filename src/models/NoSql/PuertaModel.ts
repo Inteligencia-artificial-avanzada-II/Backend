@@ -21,7 +21,7 @@ export interface Puerta {
 }
 
 // Interfaz para el documento de colección de `Fosas`
-export interface PuertaDocument extends Document {
+export interface PuertasDocument extends Document {
   puertas: Puerta[];
 }
 
@@ -38,12 +38,12 @@ const PuertaSchema = new Schema<Puerta>({
 });
 
 // Esquema para la colección de `Fosas`
-const PuertasSchema = new Schema<PuertaDocument>({
+const PuertasSchema = new Schema<PuertasDocument>({
   puertas: { type: [PuertaSchema], required: true },
 });
 
 // Exportamos el modelo de `Fosas`
-export const MongoPuertasModel = model<PuertaDocument>(
+export const MongoPuertasModel = model<PuertasDocument>(
   "Puertas",
   PuertasSchema
 );

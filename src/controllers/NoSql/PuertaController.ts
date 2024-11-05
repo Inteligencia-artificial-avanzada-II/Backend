@@ -2,6 +2,7 @@ import e, { Request, Response } from "express";
 import { MongoPuertasModel } from "../../models/NoSql/PuertaModel";
 import AbstractController from "../AbstractController";
 import { validateTokenMiddleware } from "../../middlewares/validateToken";
+import moment from "moment";
 
 class PuertaController extends AbstractController {
   private static _instance: PuertaController;
@@ -21,6 +22,11 @@ class PuertaController extends AbstractController {
       "/crear",
       validateTokenMiddleware,
       this.postCrear.bind(this)
+    );
+    this.router.put(
+      "/acomodar",
+      validateTokenMiddleware,
+      this.putAcomodar.bind(this)
     );
     // this.router.get('/consultarTodos', this.getTodos.bind(this));
     // this.router.get('/consultar/:id', this.getPorId.bind(this));
@@ -54,6 +60,57 @@ class PuertaController extends AbstractController {
     } catch (error) {
       console.error("Error al crear el documento de puertas:", error);
       res.status(500).send(`Error al crear el documento de puertas: ${error}`);
+    }
+  }
+
+  private async putAcomodar(req: Request, res: Response) {
+    try {
+      const { idContenedor } = req.body;
+
+      if (!idContenedor) {
+        return res.status(400).send("Debe proporcionar un 'idContenedor'.");
+      }
+
+      const fechaHoy = moment().format("DD/MM/YY");
+      const horaActual = moment().format("HH:mm");
+
+      // Busca el documento único que contiene todas las puertas
+      const puertasDocument = await MongoPuertasModel.findOne();
+
+      if (!puertasDocument) {
+        return res.status(404).send("No se encontraron documentos de puertas.");
+      }
+
+      let anyUpdated = false; // Bandera para saber si se realizó alguna actualización
+
+      // Recorre cada puerta y revisa si no está ocupada
+      puertasDocument.puertas.forEach((puerta) => {
+        if (!puerta.isOccupied) {
+          // Inicializa el objeto daily si la fecha de hoy no existe
+          if (!puerta.daily[fechaHoy]) {
+            puerta.daily[fechaHoy] = {};
+          }
+
+          // Añade la entrada en daily con el formato "idContenedor-HH:MM"
+          puerta.daily[fechaHoy][`${idContenedor}-${horaActual}`] = true;
+          anyUpdated = true;
+        }
+      });
+
+      // Guarda el documento solo si se realizó alguna actualización
+      if (anyUpdated) {
+        await puertasDocument.save();
+        res.status(200).send("Contenedores acomodados correctamente.");
+      } else {
+        res
+          .status(200)
+          .send(
+            "No se encontraron puertas desocupadas para acomodar contenedores."
+          );
+      }
+    } catch (error) {
+      console.error("Error al acomodar los contenedores:", error);
+      res.status(500).send(`Error al acomodar los contenedores: ${error}`);
     }
   }
 }
