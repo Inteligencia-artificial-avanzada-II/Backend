@@ -16,15 +16,39 @@ class UsuarioController extends AbstractController {
 
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
-    this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
-    this.router.get("/consultarTodos", validateTokenMiddleware, this.getTodos.bind(this));
-    this.router.get("/consultar/:id", validateTokenMiddleware, this.getPorId.bind(this));
-    this.router.put("/actualizar/:id", validateTokenMiddleware, this.putActualizar.bind(this));
-    this.router.delete("/eliminar/:id", validateTokenMiddleware, this.deletePorId.bind(this));
+    this.router.post(
+      "/crear",
+      validateTokenMiddleware,
+      this.postCrear.bind(this)
+    );
+    this.router.get(
+      "/consultarTodos",
+      validateTokenMiddleware,
+      this.getTodos.bind(this)
+    );
+    this.router.get(
+      "/consultar/:id",
+      validateTokenMiddleware,
+      this.getPorId.bind(this)
+    );
+    this.router.put(
+      "/actualizar/:id",
+      validateTokenMiddleware,
+      this.putActualizar.bind(this)
+    );
+    this.router.delete(
+      "/eliminar/:id",
+      validateTokenMiddleware,
+      this.deletePorId.bind(this)
+    );
     this.router.post("/login", this.postLogin.bind(this));
     this.router.post("/validatoken", this.postValidaToken.bind(this));
-    this.router.post("/admintoken", validateTokenMiddleware, this.postTokenSinExpiracion.bind(this));
-    this.router.post("/loginCaseta", validateTokenMiddleware, this.postLoginCaseta.bind(this));
+    this.router.post(
+      "/admintoken",
+      validateTokenMiddleware,
+      this.postTokenSinExpiracion.bind(this)
+    );
+    this.router.post("/loginCaseta", this.postLoginCaseta.bind(this));
   }
 
   private async getTest(req: Request, res: Response) {
@@ -156,12 +180,10 @@ class UsuarioController extends AbstractController {
         return;
       }
       const token = createJWT({ idUsuario: idUsuario, rolUsuario: rolUsuario });
-      res
-        .status(200)
-        .json({
-          message: "Datos validados exitosamente",
-          data: { isValid: true, token: token, rolUsuario: rolUsuario },
-        });
+      res.status(200).json({
+        message: "Datos validados exitosamente",
+        data: { isValid: true, token: token, rolUsuario: rolUsuario },
+      });
     } catch (error) {
       res.status(500).send(`Error al hacer login: ${error}`);
     }
