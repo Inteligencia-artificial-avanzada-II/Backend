@@ -432,7 +432,7 @@ class OrdenController extends AbstractController {
       const putObjectRequest = {
         bucketName: this.bucketName,
         namespaceName: this.namespace,
-        objectName: `${Date.now()}_${file.originalname}`, // Nombre del archivo en el bucket
+        objectName: `LibroOrdenes`, // Nombre del archivo en el bucket
         putObjectBody: csvFile,
         contentLength: csvFile.length,
       };
