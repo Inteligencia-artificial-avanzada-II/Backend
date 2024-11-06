@@ -16,6 +16,7 @@ import QrController from "./controllers/QrController";
 import MongoProductosController from "./controllers/NoSql/MongoProductosController";
 import FosaController from "./controllers/NoSql/FosaController";
 import PuertaController from "./controllers/NoSql/PuertaController";
+import PriorityProductController from "./controllers/NoSql/ProductoPrioridadController"
 
 const server = new Server({
   port: PORT,
@@ -36,6 +37,7 @@ const server = new Server({
     QrController.instance,
     FosaController.instance,
     PuertaController.instance,
+    PriorityProductController.instance,
   ],
 });
 

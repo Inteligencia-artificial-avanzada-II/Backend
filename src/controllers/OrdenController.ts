@@ -6,7 +6,7 @@ import QrController from "./QrController";
 import { validateTokenMiddleware } from "../middlewares/validateToken";
 import UsuarioController from "./UsuarioController";
 import { validateJWT } from "../utils/jwt";
-import multer from "multer";
+import { upload } from "../config/multer"
 import path from "path";
 import fs from "fs";
 import { ConfigFileAuthenticationDetailsProvider } from "oci-common";
@@ -30,9 +30,6 @@ class OrdenController extends AbstractController {
 
   private namespace = BUCKET_NAMESPACE;
   private bucketName = BUCKET_NAME;
-
-  // Configuración de multer para manejar archivos CSV
-  private upload = multer({ dest: "uploads/" });
 
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
@@ -85,6 +82,7 @@ class OrdenController extends AbstractController {
     this.router.post(
       "/csvUpload",
       validateTokenMiddleware,
+      upload.single("file"),
       this.postCsvUpload.bind(this)
     );
   }
@@ -113,6 +111,7 @@ class OrdenController extends AbstractController {
         "idCamion",
         "origen",
         "idCedis",
+        "localization"
       ];
       for (const field of sqlRequiredFields) {
         if (!sqlData || !sqlData[field]) {
@@ -184,6 +183,8 @@ class OrdenController extends AbstractController {
           data: {},
         });
       }
+
+      console.log(sqlData)
 
       // Crear la orden en SQL e incluir el idMongoProductos
       const orden = await db.Orden.create({
@@ -416,6 +417,8 @@ class OrdenController extends AbstractController {
     try {
       const file = req.file;
 
+      console.log(file); // Debería mostrar los detalles del archivo correctamente
+
       // Verifica si el archivo fue subido
       if (!file) {
         return res.status(400).json({
@@ -424,15 +427,14 @@ class OrdenController extends AbstractController {
         });
       }
 
-      // Lee el archivo CSV desde el directorio temporal
-      const filePath = path.join(__dirname, file.path);
-      const csvFile = fs.readFileSync(filePath);
+      // Usa directamente `file.path` para leer el archivo
+      const csvFile = fs.readFileSync(file.path);
 
-      // Configuración para la solicitud de subida
+      // Configuración para la solicitud de subida a Oracle Cloud
       const putObjectRequest = {
         bucketName: this.bucketName,
         namespaceName: this.namespace,
-        objectName: `LibroOrdenes`, // Nombre del archivo en el bucket
+        objectName: `LibroOrdenes.csv`, // Nombre del archivo en el bucket
         putObjectBody: csvFile,
         contentLength: csvFile.length,
       };
@@ -441,7 +443,7 @@ class OrdenController extends AbstractController {
       const putObject = await this.client.putObject(putObjectRequest);
 
       // Elimina el archivo temporal del sistema de archivos local
-      fs.unlinkSync(filePath);
+      fs.unlinkSync(file.path);
 
       res.status(200).json({
         message: "Archivo CSV subido exitosamente a Oracle Cloud.",
@@ -458,6 +460,7 @@ class OrdenController extends AbstractController {
       });
     }
   }
+
 }
 
 export default OrdenController;
