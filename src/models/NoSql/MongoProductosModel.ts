@@ -14,6 +14,7 @@ export interface Order extends Document {
     createdBy: string;
     modifiedBy: string;
     creationDate: string;
+    fechaSalida: string;
     products: Product[];
 }
 
@@ -31,6 +32,7 @@ const OrderSchema = new Schema<Order>({
     createdBy: { type: String, required: true },
     modifiedBy: { type: String, required: true },
     creationDate: { type: String, required: true },
+    fechaSalida: {type: String, required: true},
     products: { type: [ProductSchema], required: true }
 }, {
     timestamps: true  // Agrega createdAt y updatedAt automáticamente

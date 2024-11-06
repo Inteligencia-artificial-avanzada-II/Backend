@@ -255,13 +255,11 @@ class OrdenController extends AbstractController {
         order: [["idOrden", "DESC"]]
       });
 
-      console.log(ordenesActivas)
-
       // Verifica si no existen órdenes activas
       if (ordenesActivas.length === 0) {
         return res
           .status(404)
-          .send("No hay órdenes activas para el ID proporcionado.");
+          .json({message: "No hay órdenes activas para el ID proporcionado.", data: {}});
       }
 
       // Si existen varias órdenes activas, selecciona la de mayor valor (primer resultado)
@@ -273,7 +271,7 @@ class OrdenController extends AbstractController {
         data: ordenMayorValor,
       });
     } catch (error) {
-      res.status(500).send(`Error al consultar las órdenes activas: ${error}`);
+      res.status(500).json({message: `Error al consultar las órdenes activas: ${error}`, data: {}});
     }
   }
 }

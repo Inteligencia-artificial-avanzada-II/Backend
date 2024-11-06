@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { MongoProductosModel, Order } from "../../models/NoSql/MongoProductosModel";  // Importamos la interfaz Order también
 import AbstractController from "../AbstractController";
+import { validateTokenMiddleware } from "../../middlewares/validateToken";
 
 class MongoProductosController extends AbstractController {  // Cambiamos 'typeof OrderModel' a 'Order'
     private static _instance: MongoProductosController;
@@ -20,12 +21,12 @@ class MongoProductosController extends AbstractController {  // Cambiamos 'typeo
     }
 
     protected initializeRoutes(): void {
-        this.router.get("/test", this.getTest.bind(this));
-        this.router.post("/crear", this.postCrear.bind(this));
-        this.router.get("/consultarTodos", this.getTodos.bind(this));
-        this.router.get("/consultar/:id", this.getPorId.bind(this));
-        this.router.put("/actualizar/:id", this.putActualizar.bind(this));
-        this.router.delete("/eliminar/:id", this.deletePorId.bind(this));
+        this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
+        this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
+        this.router.get("/consultarTodos", validateTokenMiddleware, this.getTodos.bind(this));
+        this.router.get("/consultar/:id", validateTokenMiddleware, this.getPorId.bind(this));
+        this.router.put("/actualizar/:id", validateTokenMiddleware, this.putActualizar.bind(this));
+        this.router.delete("/eliminar/:id", validateTokenMiddleware, this.deletePorId.bind(this));
     }
 
     // Métodos privados
@@ -83,14 +84,16 @@ class MongoProductosController extends AbstractController {  // Cambiamos 'typeo
     private async getPorId(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const order = await this.model.findById(id);
-            if (!order) {
-                res.status(404).send(`Orden con id ${id} no encontrada`);
-                return;
+            if (id) {
+                const order = await this.model.findById(id);
+                if (!order) {
+                    res.status(404).json({message: `Orden con id ${id} no encontrada`, data: {}});
+                    return;
+                }
+                res.status(200).json({message: "Datos obtenidos exitosamente", data: order});
             }
-            res.status(200).send(order);
         } catch (error) {
-            res.status(500).send(`Error al consultar la Orden: ${error}`);
+            res.status(500).json({message: `Error al consultar la Orden: ${error}`, data: {}});
         }
     }
 

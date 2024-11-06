@@ -9,6 +9,7 @@ interface ContenedorAttributes {
   contraseña: string;
   tipo: string;
   status: string;
+  rental: boolean;
 }
 
 // Exporta una función que define el modelo Contenedor
@@ -23,6 +24,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public contraseña!: string;
     public tipo!: string;
     public status!: string;
+    public rental!: boolean;
 
     // Método para comparar la contraseña ingresada con el hash almacenado
     public async validatePassword(contraseña: string): Promise<boolean> {
@@ -55,6 +57,10 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       },
       status: {
         type: DataTypes.STRING,
+        allowNull: false,
+      },
+      rental: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
     },

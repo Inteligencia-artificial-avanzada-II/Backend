@@ -9,7 +9,9 @@
     "build:start": "tsc && node -r dotenv/config dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build:pm2": "tsc && pm2 start pm2.config.js",
-    "dev:watch": "nodemon"
+    "dev:watch": "nodemon",
+    "migrate": "ts-node src/migrate.ts",
+    "migrate:undo": "ts-node src/migrateUndo.ts"
   },
   "keywords": [],
   "author": "",
@@ -51,6 +53,7 @@
     "@types/qrcode": "^1.5.5",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.6.3"
   }
 }

@@ -17,7 +17,7 @@ class FosaController extends AbstractController {
   protected initializeRoutes(): void {
     this.router.get("/test", this.getTest.bind(this));
     this.router.post("/crear", this.postCrear.bind(this));
-    // this.router.get('/consultarTodos', this.getTodos.bind(this));
+    this.router.get('/consultarTodos', this.getTodos.bind(this));
     // this.router.get('/consultar/:id', this.getPorId.bind(this));
     // this.router.put('/actualizar/:id', this.putActualizar.bind(this));
     // this.router.delete('/eliminar/:id', this.deletePorId.bind(this));
@@ -57,6 +57,16 @@ class FosaController extends AbstractController {
       res.status(500).send(`Error al crear el documento de fosas: ${error}`);
     }
   }
+
+  private async getTodos(req: Request, res: Response) {
+    try {
+      const orders = await this.model.find();
+      res.status(200).json(orders);
+    } catch (error) {
+      res.status(500).json({ error: `Error al consultar las Órdenes: ${error}` });
+    }
+  }
+
 }
 
 export default FosaController;
