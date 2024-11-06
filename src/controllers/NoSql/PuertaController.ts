@@ -28,7 +28,7 @@ class PuertaController extends AbstractController {
       validateTokenMiddleware,
       this.putAcomodar.bind(this)
     );
-    // this.router.get('/consultarTodos', this.getTodos.bind(this));
+    this.router.get("/consultarTodos", this.getTodos.bind(this));
     // this.router.get('/consultar/:id', this.getPorId.bind(this));
     // this.router.put('/actualizar/:id', this.putActualizar.bind(this));
     // this.router.delete('/eliminar/:id', this.deletePorId.bind(this));
@@ -111,6 +111,17 @@ class PuertaController extends AbstractController {
     } catch (error) {
       console.error("Error al acomodar los contenedores:", error);
       res.status(500).send(`Error al acomodar los contenedores: ${error}`);
+    }
+  }
+
+  private async getTodos(req: Request, res: Response) {
+    try {
+      const puertas = await this.model.find();
+      res.status(200).json(puertas);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: `Error al consultar las Puertas: ${error}` });
     }
   }
 }
