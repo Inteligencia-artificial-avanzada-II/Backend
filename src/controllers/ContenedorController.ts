@@ -74,14 +74,15 @@ class ContenedorController extends AbstractController {
 
   private async postCrear(req: Request, res: Response) {
     try {
-      const { userName, capacidad, contraseña, tipo, status, rental } = req.body;
+      const { userName, capacidad, contraseña, tipo, status, rental } =
+        req.body;
       const contenedor = await db.Contenedor.create({
         userName,
         capacidad,
         contraseña,
         tipo,
         status,
-        rental
+        rental,
       });
 
       res.status(201).send(contenedor);
@@ -183,7 +184,11 @@ class ContenedorController extends AbstractController {
       });
       res.status(200).json({
         message: "Datos validados exitosamente",
-        data: { isValid: true, token: token },
+        data: {
+          isValid: true,
+          token: token,
+          idContenedor: contenedor.idContenedor,
+        },
       });
     } catch (error) {
       res.status(500).send(`Error al hacer login: ${error}`);
