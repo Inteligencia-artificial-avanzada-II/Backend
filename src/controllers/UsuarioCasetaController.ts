@@ -27,14 +27,15 @@ class UsuarioCasetaController extends AbstractController {
 
   private async testPythonBack(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization || "{{Token}}"; // Reemplaza "{{Token}}" con el token si es fijo
+      console.log("RequestPython recibido")
+      const token = req.headers.authorization || "{{Token}}";
 
       const response = await axios.get(`${BACK_PYTHON}/predictions/test`,  {
         headers: {
           Authorization: `Token ${token}`
         }
       });
-
+      console.log("Si pasó")
       // Enviar la respuesta del backend de Python al cliente
       res.status(response.status).json({"Message": "OK"});
     } catch (error: any) {
