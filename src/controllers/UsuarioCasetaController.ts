@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
+import axios from "axios";
 import AbstractController from "./AbstractController";
 import db from "../models";
 import { validateTokenMiddleware } from "../middlewares/validateToken";
+import { BACK_PYTHON } from "../config";
 
 class UsuarioCasetaController extends AbstractController {
   private static _instance: UsuarioCasetaController;
@@ -20,7 +22,29 @@ class UsuarioCasetaController extends AbstractController {
     this.router.get("/consultar/:id", validateTokenMiddleware, this.getPorId.bind(this));
     this.router.put("/actualizar/:id", validateTokenMiddleware, this.putActualizar.bind(this));
     this.router.delete("/eliminar/:id", validateTokenMiddleware, this.deletePorId.bind(this));
+    this.router.get("/pruebapython", validateTokenMiddleware, this.testPythonBack.bind(this))
   }
+
+  private async testPythonBack(req: Request, res: Response) {
+    try {
+      const token = req.headers.authorization || "{{Token}}"; // Reemplaza "{{Token}}" con el token si es fijo
+
+      const response = await axios.get(`${BACK_PYTHON}/predictions/test`,  {
+        headers: {
+          Authorization: `Token ${token}`
+        }
+      });
+
+      // Enviar la respuesta del backend de Python al cliente
+      res.status(response.status).json({"Message": "OK"});
+    } catch (error: any) {
+      // Manejo de errores
+      res.status(error.response?.status || 500).json({
+        message: "Error al conectar con el backend de Python",
+        error: error.message
+      });
+    }
+  };
 
   private async getTest(req: Request, res: Response) {
     /**
