@@ -6,7 +6,7 @@ import QrController from "./QrController";
 import { validateTokenMiddleware } from "../middlewares/validateToken";
 import UsuarioController from "./UsuarioController";
 import { validateJWT } from "../utils/jwt";
-import { upload } from "../config/multer";
+import { upload } from "../config/multer"
 import path from "path";
 import fs from "fs";
 import { ConfigFileAuthenticationDetailsProvider } from "oci-common";
@@ -85,23 +85,6 @@ class OrdenController extends AbstractController {
       upload.single("file"),
       this.postCsvUpload.bind(this)
     );
-
-    this.router.get(
-      "/consultarPorFecha",
-      validateTokenMiddleware,
-      this.getOrdersByDateRange.bind(this)
-    );
-
-    this.router.get(
-      "/consultarIdMongo/:id",
-      validateTokenMiddleware,
-      this.getOrdersByIdMongo.bind(this)
-    );
-    this.router.get(
-      "/consultarConFiltros",
-      validateTokenMiddleware,
-      this.getOrdersWithFilters.bind(this)
-    );
   }
 
   private async getTest(req: Request, res: Response) {
@@ -128,7 +111,7 @@ class OrdenController extends AbstractController {
         "idCamion",
         "origen",
         "idCedis",
-        "localization",
+        "localization"
       ];
       for (const field of sqlRequiredFields) {
         if (!sqlData || !sqlData[field]) {
@@ -201,7 +184,7 @@ class OrdenController extends AbstractController {
         });
       }
 
-      console.log(sqlData);
+      console.log(sqlData)
 
       // Crear la orden en SQL e incluir el idMongoProductos
       const orden = await db.Orden.create({
@@ -478,134 +461,6 @@ class OrdenController extends AbstractController {
     }
   }
 
-  private async getOrdersByDateRange(req: Request, res: Response) {
-    try {
-      const { startDate, endDate } = req.query;
-
-      // Validar fechas
-      if (!startDate || !endDate) {
-        return res.status(400).json({
-          message: "Los parámetros startDate y endDate son obligatorios",
-          data: {},
-        });
-      }
-
-      const start = new Date(startDate as string);
-      const end = new Date(endDate as string);
-
-      const mongoController = MongoProductosController.instance;
-      const ordersInRange = await mongoController.getOrdersByDateRange(
-        start,
-        end
-      );
-
-      if (!ordersInRange.length) {
-        return res.status(404).json({
-          message:
-            "No se encontraron órdenes en el rango de fechas especificado",
-          data: {},
-        });
-      }
-
-      res.status(200).json({
-        message: "Órdenes consultadas exitosamente",
-        data: ordersInRange,
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: `Error al consultar las órdenes por rango de fecha: ${error}`,
-        data: {},
-      });
-    }
-  }
-
-  private async getOrdersByIdMongo(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const order = await db.Orden.findOne({ where: { idMongoProductos: id } });
-
-      if (!order) {
-        return res.status(404).json({
-          message: `Orden con idMongoProductos ${id} no encontrada`,
-          data: {},
-        });
-      }
-      res.status(200).json({
-        message: "Datos obtenidos exitosamente",
-        data: order,
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: `Error al consultar la Orden: ${error}`,
-        data: {},
-      });
-    }
-  }
-
-  private async getOrdersWithFilters(req: Request, res: Response) {
-    try {
-      const { startDate, endDate, idContenedor, idCamion, origen, idCedis } =
-        req.query;
-
-      // Construir filtros para SQL (agregar solo si tienen valor)
-      const sqlFilters: any = {};
-      if (idContenedor) sqlFilters.idContenedor = idContenedor;
-      if (idCamion) sqlFilters.idCamion = idCamion;
-      if (origen) sqlFilters.origen = origen;
-      if (idCedis) sqlFilters.idCedis = idCedis;
-
-      let sqlOrders;
-      let mongoOrders;
-      const mongoController = MongoProductosController.instance;
-
-      // Si no hay fechas ni filtros, obtener todas las órdenes
-      if (!startDate && !endDate && Object.keys(sqlFilters).length === 0) {
-        // Obtener todas las órdenes de SQL sin filtro
-        sqlOrders = await db.Orden.findAll();
-
-        // Obtener todas las órdenes de MongoDB sin filtro
-        mongoOrders = await mongoController.getAllOrders();
-      } else {
-        // Convertir las fechas a Date si están presentes
-        const start = startDate ? new Date(startDate as string) : undefined;
-        const end = endDate ? new Date(endDate as string) : undefined;
-
-        // Consulta a SQL con los filtros especificados
-        sqlOrders = await db.Orden.findAll({
-          where: sqlFilters,
-        });
-
-        // Obtener los IDs de Mongo relacionados a las órdenes encontradas en SQL
-        const mongoIds = sqlOrders.map((order: any) => order.idMongoProductos);
-
-        // Consulta a MongoDB usando los IDs y el rango de fechas (si se especifican)
-        mongoOrders = await mongoController.getOrdersByIdsAndDateRange(
-          mongoIds,
-          start,
-          end
-        );
-      }
-
-      const combinedOrders = sqlOrders.map((sqlOrder: any) => {
-        const mongoOrder =
-          mongoOrders.find(
-            (m: any) => m._id.toString() === sqlOrder.idMongoProductos
-          ) || {}; // Asegura que siempre haya mongoData
-
-        return { sqlData: sqlOrder, mongoData: mongoOrder };
-      });
-
-      res.status(200).json({
-        message: "Órdenes consultadas exitosamente",
-        data: combinedOrders,
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: `Error al consultar las órdenes con filtros: ${error}`,
-        data: {},
-      });
-    }
-  }
 }
 
 export default OrdenController;
