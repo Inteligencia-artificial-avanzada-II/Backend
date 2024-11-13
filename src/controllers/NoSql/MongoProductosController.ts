@@ -244,7 +244,11 @@ class MongoProductosController extends AbstractController {
 
       // Agregar rango de fechas solo si startDate y endDate están definidos
       if (startDate && endDate) {
-        filter.creationDate = { $gte: startDate, $lte: endDate };
+        const orders = await this.model.find({
+          creationDate: { $gte: startDate, $lte: endDate }, // Usa las fechas como cadenas
+        });
+
+        return orders;
       }
 
       const orders = await this.model.find(filter).select("-__v"); // Excluir '__v' si no es necesario
