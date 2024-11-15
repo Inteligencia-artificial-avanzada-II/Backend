@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import AbstractController from "./AbstractController";
 import db from "../models";
 import { validateTokenMiddleware } from "../middlewares/validateToken";
+import PuertaContenedorController from "./PuertaContenedorController";
 
 class PuertaController extends AbstractController {
   private static _instance: PuertaController;
@@ -44,6 +45,11 @@ class PuertaController extends AbstractController {
       "/actualizarOcupado/:id",
       validateTokenMiddleware,
       this.putActualizarOcupado.bind(this)
+    );
+    this.router.post(
+      "/acomodar",
+      validateTokenMiddleware,
+      this.postAcomodar.bind(this)
     );
   }
 
@@ -125,6 +131,35 @@ class PuertaController extends AbstractController {
       }
     } catch (error) {
       res.status(500).send(`Error al actualizar la Puerta ${error}`);
+    }
+  }
+
+  private async postAcomodar(req: Request, res: Response) {
+    try {
+      const { idContenedor } = req.body;
+      const puertas = await db.Puerta.findAll({
+        where: { isOccupied: false },
+      });
+
+      if (puertas.length === 0) {
+        res.status(404).send("No hay puertas disponibles");
+      } else {
+        const puerta = puertas[0];
+        const PuertaContenedorControllerInstance =
+          PuertaContenedorController.instance;
+
+        const puertacontenedor =
+          await PuertaContenedorControllerInstance.ContenedorEnPuerta({
+            idContenedor,
+            idPuerta: puerta.idPuerta,
+            fecha: new Date(),
+          });
+
+        await puerta.update({ isOccupied: true });
+        res.status(200).json({ puerta, puertacontenedor });
+      }
+    } catch (error) {
+      res.status(500).send(`Error al acomodar la Puerta: ${error}`);
     }
   }
 }

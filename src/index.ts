@@ -18,6 +18,7 @@ import FosaController from "./controllers/NoSql/FosaController";
 import PriorityProductController from "./controllers/NoSql/ProductoPrioridadController";
 import InventarioFabricaController from "./controllers/NoSql/InventarioFabricaController";
 import PuertaController from "./controllers/PuertaController";
+import PuertaContenedorController from "./controllers/PuertaContenedorController";
 
 const server = new Server({
   port: PORT,
@@ -40,6 +41,7 @@ const server = new Server({
     PriorityProductController.instance,
     InventarioFabricaController.instance,
     PuertaController.instance,
+    PuertaContenedorController.instance,
   ],
 });
 
