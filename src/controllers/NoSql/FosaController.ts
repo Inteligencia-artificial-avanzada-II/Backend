@@ -24,7 +24,7 @@ class FosaController extends AbstractController {
     this.router.post("/agregarContenedor", this.agregarContenedor.bind(this));
   }
 
-  public async agregarContenedor(req: Request, res: Response) {
+  private async agregarContenedor(req: Request, res: Response) {
     try {
       const { dateTime, idContenedor } = req.body;
 
@@ -120,6 +120,62 @@ class FosaController extends AbstractController {
         .json({ error: `Error al consultar las Órdenes: ${error}` });
     }
   }
+
+  // Métodos Públicos
+  public async agregarContenedorDirecto(
+    dateTime: string,
+    idContenedor: string
+  ): Promise<any> {
+    try {
+      // Validar que se reciban los parámetros necesarios
+      if (!dateTime || !idContenedor) {
+        throw new Error("Los parámetros 'dateTime' e 'idContenedor' son obligatorios.");
+      }
+
+      // Crear el objeto Date a partir de `dateTime` en formato ISO
+      const date = new Date(dateTime);
+
+      // Validar que la fecha sea válida
+      if (isNaN(date.getTime())) {
+        throw new Error("El formato de 'dateTime' no es válido.");
+      }
+
+      // Formatear la fecha como "dd/mm/yy"
+      const fecha = date.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+      });
+
+      // Formatear la hora como "HH:MM"
+      const hora = date.toTimeString().slice(0, 5);
+
+      // Formato del contenedor a agregar: "idContenedor-hora"
+      const contenedorKey = `${idContenedor}-${hora}`;
+
+      // Encontrar la fosa actual (suponiendo que solo hay una)
+      const fosaDocument = await this.model.findOne();
+
+      if (!fosaDocument) {
+        throw new Error("No se encontró la fosa.");
+      }
+
+      // Construir la ruta de actualización dinámica
+      const updatePath = `fosa.daily.${fecha}.${contenedorKey}`;
+
+      // Actualizar el documento en la base de datos
+      const updatedDocument = await this.model.findByIdAndUpdate(
+        fosaDocument._id,
+        { $set: { [updatePath]: true } },
+        { new: true } // Devuelve el documento actualizado
+      );
+
+      return updatedDocument; // Devolver el documento actualizado
+    } catch (error) {
+      throw new Error(`Error al agregar el contenedor: ${error}`);
+    }
+  }
+
 }
 
 export default FosaController;

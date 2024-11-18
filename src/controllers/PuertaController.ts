@@ -1,8 +1,11 @@
 import e, { Request, Response } from "express";
+import axios from "axios";
 import AbstractController from "./AbstractController";
 import db from "../models";
 import { validateTokenMiddleware } from "../middlewares/validateToken";
 import PuertaContenedorController from "./PuertaContenedorController";
+import FosaController from "./NoSql/FosaController";
+import config from "../config/config";
 
 class PuertaController extends AbstractController {
   private static _instance: PuertaController;
@@ -136,13 +139,37 @@ class PuertaController extends AbstractController {
 
   private async postAcomodar(req: Request, res: Response) {
     try {
-      const { idContenedor } = req.body;
+      const pythonUrl = config.development.backPython;
+      const authorizationToken = req.headers['authorization']?.split('Token ')[1];
+      const headersForSent = {
+        'Content-Type': 'application/json',
+        'Authorization': `Token ${authorizationToken}`,
+      };
+      const dataForSent = {
+        "extraData": []
+      };
+      const { idContenedor, dateTime } = req.body;
       const puertas = await db.Puerta.findAll({
         where: { isOccupied: false },
       });
 
       if (puertas.length === 0) {
-        res.status(404).send("No hay puertas disponibles");
+        console.log(pythonUrl)
+
+        const fosaControlador = FosaController.instance;
+
+        try {
+          // Añadimos el contenedor en la fosa
+          const agregarContenedor = fosaControlador.agregarContenedorDirecto(idContenedor, dateTime)
+          // Realizamos la petición al modelo
+          const responseModelo = await axios.post(`${pythonUrl}/predictions/predict`, dataForSent, { headers: headersForSent });
+          const lista = responseModelo.data.data
+
+          res.status(200).json({message: "Ordenamiento generado exitosamente", data: lista})
+        } catch (error) {
+          res.status(400).json({message: `Lo sentimos, ocurrió un error con el modelo: ${error}`, data: {}})
+        }        
+
       } else {
         const puerta = puertas[0];
         const PuertaContenedorControllerInstance =

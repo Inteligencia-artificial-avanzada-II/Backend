@@ -7,7 +7,6 @@ import { validateTokenMiddleware } from "../middlewares/validateToken";
 import UsuarioController from "./UsuarioController";
 import { validateJWT } from "../utils/jwt";
 import { upload } from "../config/multer";
-import path from "path";
 import fs from "fs";
 import { ConfigFileAuthenticationDetailsProvider } from "oci-common";
 import { ObjectStorageClient } from "oci-objectstorage";
@@ -606,6 +605,35 @@ class OrdenController extends AbstractController {
       });
     }
   }
+
+  private async getOrderCamionInEstatus(req: Request, res: Response) {
+    try {
+      // Obtener el estatus de los parámetros de la ruta
+      const estatus = req.params.estatus;
+
+      // Realizar la consulta al modelo Orden
+      const orders = await db.Orden.findAll({
+        where: {
+          isActive: true,
+          localization: estatus
+        }
+      });
+
+      // Enviar la respuesta con los datos obtenidos
+      res.status(200).json({
+        message: 'Órdenes obtenidas exitosamente',
+        data: orders
+      });
+    } catch (error) {
+      // Manejo de errores
+      console.error('Error al obtener las órdenes:', error);
+      res.status(500).json({
+        message: `Hubo un error al obtener las órdenes: ${error}`,
+        data: {} 
+      });
+    }
+  }
+
 }
 
 export default OrdenController;
