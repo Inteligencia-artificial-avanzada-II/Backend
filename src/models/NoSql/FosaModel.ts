@@ -12,35 +12,32 @@ interface DailyEntry {
 
 // Interfaz para cada `Fosa`
 export interface Fosa {
-  name: string;
-  description: string;
-  capacity: number;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
   daily: DailyEntry;
 }
 
 // Interfaz para el documento de colección de `Fosas`
 export interface FosasDocument extends Document {
-  fosas: Fosa[];
+  fosa: Fosa;
 }
 
-// Esquema para cada `Fosa`
-const FosaSchema = new Schema<Fosa>({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  capacity: { type: Number, required: true },
-  created_at: { type: Date, required: true },
-  updated_at: { type: Date, required: true },
-  daily: {
-    type: Schema.Types.Mixed, // Flexibilidad total para almacenar objetos de fechas y contenedores
-    required: true,
+// Esquema para cada `Fosa` con timestamps automáticos
+const FosaSchema = new Schema<Fosa>(
+  {
+    daily: {
+      type: Schema.Types.Mixed, // Flexibilidad total para almacenar objetos de fechas y contenedores
+      required: true,
+    },
   },
-});
+  {
+    timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" }, // Genera automáticamente createdAt y updatedAt
+  }
+);
 
 // Esquema para la colección de `Fosas`
 const FosasSchema = new Schema<FosasDocument>({
-  fosas: { type: [FosaSchema], required: true },
+  fosa: { type: FosaSchema, required: true },
 });
 
 // Exportamos el modelo de `Fosas`

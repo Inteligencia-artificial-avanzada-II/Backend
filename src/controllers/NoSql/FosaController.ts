@@ -17,10 +17,64 @@ class FosaController extends AbstractController {
   protected initializeRoutes(): void {
     this.router.get("/test", this.getTest.bind(this));
     this.router.post("/crear", this.postCrear.bind(this));
-    this.router.get('/consultarTodos', this.getTodos.bind(this));
+    this.router.get("/consultarTodos", this.getTodos.bind(this));
     // this.router.get('/consultar/:id', this.getPorId.bind(this));
     // this.router.put('/actualizar/:id', this.putActualizar.bind(this));
     // this.router.delete('/eliminar/:id', this.deletePorId.bind(this));
+    this.router.post("/agregarContenedor", this.agregarContenedor.bind(this));
+  }
+
+  public async agregarContenedor(req: Request, res: Response) {
+    try {
+      const { dateTime, idContenedor } = req.body;
+
+      if (!dateTime || !idContenedor) {
+        return res
+          .status(400)
+          .send("La petición debe contener 'dateTime' e 'idContenedor'.");
+      }
+
+      // Creamos el objeto Date a partir de `dateTime` en formato ISO
+      const date = new Date(dateTime);
+
+      // Verificamos que `date` es válido
+      if (isNaN(date.getTime())) {
+        return res.status(400).send("El formato de 'dateTime' no es válido.");
+      }
+
+      // Formateamos la fecha como "dd/mm/yy"
+      const fecha = date.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+      });
+
+      // Formateamos la hora como "HH:MM"
+      const hora = date.toTimeString().slice(0, 5);
+
+      // Formato del contenedor a agregar: "idContenedor-hora"
+      const contenedorKey = `${idContenedor}-${hora}`;
+
+      // Encuentra la fosa actual (suponiendo que solo hay una)
+      const fosaDocument = await this.model.findOne();
+
+      if (!fosaDocument) {
+        return res.status(404).send("No se encontró la fosa.");
+      }
+
+      // Usa `findByIdAndUpdate` para actualizar la parte específica del documento
+      const updatePath = `fosa.daily.${fecha}.${contenedorKey}`;
+      const updatedDocument = await this.model.findByIdAndUpdate(
+        fosaDocument._id,
+        { $set: { [updatePath]: true } },
+        { new: true } // Devuelve el documento actualizado
+      );
+
+      res.status(200).send(updatedDocument);
+    } catch (error) {
+      console.error("Error al agregar el contenedor:", error);
+      res.status(500).send(`Error al agregar el contenedor: ${error}`);
+    }
   }
 
   private async getTest(req: Request, res: Response) {
@@ -38,23 +92,21 @@ class FosaController extends AbstractController {
 
   private async postCrear(req: Request, res: Response) {
     try {
-      const { fosas } = req.body; // Recibimos un array de fosas desde el request
+      const { fosa } = req.body; // Recibimos un objeto `fosa` desde el request
 
-      if (!Array.isArray(fosas) || fosas.length === 0) {
+      if (!fosa || typeof fosa !== "object") {
         return res
           .status(400)
-          .send("El cuerpo de la petición debe contener un array 'fosas'.");
+          .send("El cuerpo de la petición debe contener un objeto 'fosa'.");
       }
 
-      // Creamos el documento en la base de datos con el array de fosas
-      const fosaDocument = await this.model.create({
-        fosas,
-      });
+      // Creamos el documento en la base de datos con la fosa recibida
+      const fosaDocument = await this.model.create({ fosa });
 
       res.status(201).send(fosaDocument);
     } catch (error) {
-      console.error("Error al crear el documento de fosas:", error);
-      res.status(500).send(`Error al crear el documento de fosas: ${error}`);
+      console.error("Error al crear el documento de fosa:", error);
+      res.status(500).send(`Error al crear el documento de fosa: ${error}`);
     }
   }
 
@@ -63,10 +115,11 @@ class FosaController extends AbstractController {
       const orders = await this.model.find();
       res.status(200).json(orders);
     } catch (error) {
-      res.status(500).json({ error: `Error al consultar las Órdenes: ${error}` });
+      res
+        .status(500)
+        .json({ error: `Error al consultar las Órdenes: ${error}` });
     }
   }
-
 }
 
 export default FosaController;
