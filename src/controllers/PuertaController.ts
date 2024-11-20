@@ -140,55 +140,101 @@ class PuertaController extends AbstractController {
   private async postAcomodar(req: Request, res: Response) {
     try {
       const pythonUrl = config.development.backPython;
-      const authorizationToken = req.headers['authorization']?.split('Token ')[1];
+      const authorizationToken =
+        req.headers["authorization"]?.split("Token ")[1];
       const headersForSent = {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${authorizationToken}`,
+        "Content-Type": "application/json",
+        Authorization: `Token ${authorizationToken}`,
       };
       const dataForSent = {
-        "extraData": []
+        extraData: [],
       };
+
       const { idContenedor, dateTime } = req.body;
+
+      // Validar los parámetros de entrada
+      if (!idContenedor || !dateTime) {
+        return res.status(400).json({
+          message: "Los parámetros 'idContenedor' y 'dateTime' son obligatorios.",
+        });
+      }
+
+      // Validar formato de dateTime
+      const date = new Date(dateTime);
+      if (isNaN(date.getTime())) {
+        return res.status(400).json({
+          message: "El formato de 'dateTime' no es válido. Debe ser ISO 8601.",
+        });
+      }
+
+      // Obtener puertas disponibles
       const puertas = await db.Puerta.findAll({
         where: { isOccupied: false },
       });
 
       if (puertas.length === 0) {
-        console.log(pythonUrl)
 
         const fosaControlador = FosaController.instance;
 
         try {
-          // Añadimos el contenedor en la fosa
-          const agregarContenedor = fosaControlador.agregarContenedorDirecto(idContenedor, dateTime)
-          // Realizamos la petición al modelo
-          const responseModelo = await axios.post(`${pythonUrl}/predictions/predict`, dataForSent, { headers: headersForSent });
-          const lista = responseModelo.data.data
+          // Añadimos el contenedor a la fosa
+          const agregarContenedor =
+            await fosaControlador.agregarContenedorDirecto(
+              dateTime,
+              idContenedor
+            );
 
-          res.status(200).json({message: "Ordenamiento generado exitosamente", data: lista})
-        } catch (error) {
-          res.status(400).json({message: `Lo sentimos, ocurrió un error con el modelo: ${error}`, data: {}})
-        }        
+          // Realizamos la petición al modelo de predicción
+          const responseModelo = await axios.post(
+            `${pythonUrl}/predictions/predict`,
+            dataForSent,
+            { headers: headersForSent }
+          );
 
-      } else {
-        const puerta = puertas[0];
-        const PuertaContenedorControllerInstance =
-          PuertaContenedorController.instance;
+          const lista = responseModelo.data.data;
 
-        const puertacontenedor =
-          await PuertaContenedorControllerInstance.ContenedorEnPuerta({
-            idContenedor,
-            idPuerta: puerta.idPuerta,
-            fecha: new Date(),
+          res.status(200).json({
+            message: "Ordenamiento generado exitosamente",
+            data: lista,
           });
+        } catch (error) {
+          console.error("Error en el modelo de predicción o la fosa:", error);
+          res.status(400).json({
+            message: `Lo sentimos, ocurrió un error con el modelo o la fosa: ${error}`,
+            data: {},
+          });
+        }
+      } else {
+        try {
+          // Asignar contenedor a una puerta disponible
+          const puerta = puertas[0];
+          const PuertaContenedorControllerInstance =
+            PuertaContenedorController.instance;
 
-        await puerta.update({ isOccupied: true });
-        res.status(200).json({ puerta, puertacontenedor });
+          const puertacontenedor =
+            await PuertaContenedorControllerInstance.ContenedorEnPuerta({
+              idContenedor,
+              idPuerta: puerta.idPuerta,
+              fecha: new Date(),
+            });
+
+          // Actualizar la puerta como ocupada
+          await puerta.update({ isOccupied: true });
+
+          res.status(200).json({ puerta, puertacontenedor });
+        } catch (error) {
+          console.error("Error al asignar contenedor a la puerta:", error);
+          res.status(400).json({
+            message: `Error al asignar contenedor a la puerta: ${error}`,
+          });
+        }
       }
     } catch (error) {
-      res.status(500).send(`Error al acomodar la Puerta: ${error}`);
+      console.error("Error general en postAcomodar:", error);
+      res.status(500).send(`Error al acomodar la puerta: ${error}`);
     }
   }
+
 }
 
 export default PuertaController;

@@ -132,30 +132,31 @@ class FosaController extends AbstractController {
         throw new Error("Los parámetros 'dateTime' e 'idContenedor' son obligatorios.");
       }
 
-      // Crear el objeto Date a partir de `dateTime` en formato ISO
-      const date = new Date(dateTime);
-
-      // Validar que la fecha sea válida
-      if (isNaN(date.getTime())) {
+      // Dividir la fecha y hora del string ISO
+      const [fechaISO, horaISO] = dateTime.split("T");
+      if (!fechaISO || !horaISO) {
         throw new Error("El formato de 'dateTime' no es válido.");
       }
 
       // Formatear la fecha como "dd/mm/yy"
-      const fecha = date.toLocaleDateString("es-ES", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "2-digit",
-      });
+      const [year, month, day] = fechaISO.split("-");
+      if (!year || !month || !day) {
+        throw new Error("La fecha no tiene el formato esperado 'YYYY-MM-DD'.");
+      }
+      const fecha = `${day}/${month}/${year.slice(-2)}`;
 
       // Formatear la hora como "HH:MM"
-      const hora = date.toTimeString().slice(0, 5);
+      const [hour, minute] = horaISO.split(":");
+      if (!hour || !minute) {
+        throw new Error("La hora no tiene el formato esperado 'HH:MM:SS'.");
+      }
+      const hora = `${hour}:${minute}`;
 
       // Formato del contenedor a agregar: "idContenedor-hora"
       const contenedorKey = `${idContenedor}-${hora}`;
 
       // Encontrar la fosa actual (suponiendo que solo hay una)
       const fosaDocument = await this.model.findOne();
-
       if (!fosaDocument) {
         throw new Error("No se encontró la fosa.");
       }
@@ -170,9 +171,14 @@ class FosaController extends AbstractController {
         { new: true } // Devuelve el documento actualizado
       );
 
+      if (!updatedDocument) {
+        throw new Error("No se pudo actualizar el documento en la base de datos.");
+      }
+
       return updatedDocument; // Devolver el documento actualizado
-    } catch (error) {
-      throw new Error(`Error al agregar el contenedor: ${error}`);
+    } catch (error: any) {
+      console.error("Error al agregar el contenedor:", error.message || error);
+      throw new Error(`Error al agregar el contenedor: ${error.message || error}`);
     }
   }
 
