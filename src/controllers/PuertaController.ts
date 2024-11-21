@@ -127,7 +127,7 @@ class PuertaController extends AbstractController {
       const { id } = req.params;
       const puerta = await db.Puerta.findByPk(id);
       if (puerta) {
-        await puerta.update({ isOcuppied: !puerta.isOcuppied });
+        await puerta.update({ isOcuppied: false });
         res.status(200).json(puerta);
       } else {
         res.status(404).send("Puerta no encontrada");
@@ -155,7 +155,8 @@ class PuertaController extends AbstractController {
       // Validar los parámetros de entrada
       if (!idContenedor || !dateTime) {
         return res.status(400).json({
-          message: "Los parámetros 'idContenedor' y 'dateTime' son obligatorios.",
+          message:
+            "Los parámetros 'idContenedor' y 'dateTime' son obligatorios.",
         });
       }
 
@@ -173,7 +174,6 @@ class PuertaController extends AbstractController {
       });
 
       if (puertas.length === 0) {
-
         const fosaControlador = FosaController.instance;
 
         try {
@@ -234,7 +234,6 @@ class PuertaController extends AbstractController {
       res.status(500).send(`Error al acomodar la puerta: ${error}`);
     }
   }
-
 }
 
 export default PuertaController;
