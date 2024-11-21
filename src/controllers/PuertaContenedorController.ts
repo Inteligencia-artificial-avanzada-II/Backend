@@ -134,7 +134,7 @@ class PuertaContenedorController extends AbstractController {
       }
 
       // Buscar el contenedor en la base de datos donde isActive sea true
-      const contenedor = await db.Contenedor.findOne({
+      const contenedor = await db.PuertaContenedor.findOne({
         where: {
           idContenedor,
           isActive: true,
