@@ -41,6 +41,11 @@ class PuertaContenedorController extends AbstractController {
       validateTokenMiddleware,
       this.deletePorId.bind(this)
     );
+    this.router.get(
+      "/consultarPuerta/:idContenedor",
+      validateTokenMiddleware,
+      this.consultarPuerta.bind(this)
+    );
   }
 
   private async getTest(req: Request, res: Response) {
@@ -99,7 +104,7 @@ class PuertaContenedorController extends AbstractController {
   private async putActualizar(req: Request, res: Response) {
     try {
       await db.PuertaContenedor.update(req.body, {
-        where: { id: req.params.id },
+        where: { idPuertaContenedor: req.params.id },
       });
       res.status(200).send("PuertaContenedor actualizada");
     } catch (error) {
@@ -113,6 +118,45 @@ class PuertaContenedorController extends AbstractController {
       res.status(200).send("PuertaContenedor eliminada");
     } catch (error) {
       res.status(500).send(`Error al eliminar puertacontenedor ${error}`);
+    }
+  }
+
+  private async consultarPuerta(req: Request, res: Response): Promise<void> {
+    try {
+      const { idContenedor } = req.params;
+
+      // Validar que se reciba el parámetro idContenedor
+      if (!idContenedor) {
+        res
+          .status(400)
+          .json({ message: "El parámetro idContenedor es obligatorio." });
+        return;
+      }
+
+      // Buscar el contenedor en la base de datos donde isActive sea true
+      const contenedor = await db.Contenedor.findOne({
+        where: {
+          idContenedor,
+          isActive: true,
+        },
+      });
+
+      // Validar si no se encontró ningún contenedor
+      if (!contenedor) {
+        res.status(404).json({
+          message:
+            "No se encontró ningún contenedor activo con el id proporcionado.",
+        });
+        return;
+      }
+
+      // Devolver el contenedor encontrado
+      res.status(200).json(contenedor);
+    } catch (error) {
+      console.error("Error al consultar la puerta:", error);
+      res
+        .status(500)
+        .json({ message: "Ocurrió un error al consultar la puerta.", error });
     }
   }
 }
