@@ -5,6 +5,7 @@ interface PuertaContenedorAttributes {
   idPuerta: number;
   idContenedor: number;
   fecha: Date;
+  isActive: boolean;
 }
 
 module.exports = (sequelize: Sequelize, DataTypes: any) => {
@@ -16,6 +17,7 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     public idPuerta!: number;
     public idContenedor!: number;
     public fecha!: Date;
+    public isActive!: boolean;
 
     static associate(models: any) {
       PuertaContenedor.belongsTo(models.Puerta, {
@@ -45,6 +47,11 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
       fecha: {
         type: DataTypes.DATE,
         allowNull: false,
+      },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true, // Ajusta según tus necesidades
       },
     },
     {
