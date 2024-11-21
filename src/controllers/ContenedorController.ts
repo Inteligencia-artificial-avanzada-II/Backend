@@ -41,6 +41,11 @@ class ContenedorController extends AbstractController {
       validateTokenMiddleware,
       this.putActualizar.bind(this)
     );
+    this.router.put(
+      "/actualizarStatus/:idContenedor",
+      validateTokenMiddleware,
+      this.putActualizarStatus.bind(this)
+    );
     this.router.delete(
       "/eliminar/:id",
       validateTokenMiddleware,
@@ -143,6 +148,37 @@ class ContenedorController extends AbstractController {
       res.status(200).send(contenedor);
     } catch (error) {
       res.status(500).send(`Error al actualizar el Contenedor: ${error}`);
+    }
+  }
+
+  private async putActualizarStatus(req: Request, res: Response) {
+    try {
+      const { idContenedor } = req.params;
+      const { status } = req.body;
+      const contenedor = await db.Contenedor.findByPk(idContenedor);
+      if (!contenedor) {
+        res.status(404).send(`Contenedor con id ${idContenedor} no encontrado`);
+        return;
+      }
+      contenedor.status = status;
+      await contenedor.save();
+      res.status(200).send(contenedor);
+    } catch (error) {
+      res.status(500).send(`Error al actualizar el Contenedor: ${error}`);
+    }
+  }
+
+  public async ActualizarStatus(id: number, status: string) {
+    try {
+      const contenedor = await db.Contenedor.findByPk(id);
+      if (!contenedor) {
+        return false;
+      }
+      contenedor.status = status;
+      await contenedor.save();
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 
