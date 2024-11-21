@@ -126,6 +126,7 @@ class PuertaController extends AbstractController {
     try {
       const { id } = req.params;
       const puerta = await db.Puerta.findByPk(id);
+      console.log(puerta);
       if (puerta) {
         await puerta.update({ isOcuppied: false });
         res.status(200).json(puerta);
