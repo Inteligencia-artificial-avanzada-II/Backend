@@ -102,6 +102,10 @@ class OrdenController extends AbstractController {
       validateTokenMiddleware,
       this.getOrdersWithFilters.bind(this)
     );
+    this.router.get(
+      "/ordenInactiva/:idOrden",
+      this.putOrdenInactiva.bind(this)
+    );
   }
 
   private async getTest(req: Request, res: Response) {
@@ -640,6 +644,64 @@ class OrdenController extends AbstractController {
         message: `Hubo un error al obtener las órdenes: ${error}`,
         data: {},
       });
+    }
+  }
+
+  private async putOrdenInactiva(req: Request, res: Response) {
+    try {
+      // Obtener el ID de la orden de los parámetros de la ruta
+      const { idOrden } = req.params;
+
+      // Realizar la consulta al modelo Orden
+      const orden = await db.Orden.findByPk(idOrden);
+
+      // Validar si no se encontró la orden
+      if (!orden) {
+        res.status(404).json({
+          message: `No se encontró la orden con el ID ${idOrden}`,
+          data: {},
+        });
+        return;
+      }
+
+      // Actualizar el campo isActive a false
+      orden.isActive = false;
+      await orden.save();
+
+      // Enviar la respuesta con el mensaje de éxito
+      res.status(200).json({
+        message: "Orden inactivada exitosamente",
+        data: orden,
+      });
+    } catch (error) {
+      // Manejo de errores
+      console.error("Error al inactivar la orden:", error);
+      res.status(500).json({
+        message: `Hubo un error al inactivar la orden: ${error}`,
+        data: {},
+      });
+    }
+  }
+
+  public async ordenInactiva(idOrden: string) {
+    try {
+      // Realizar la consulta al modelo Orden
+      const orden = await db.Orden.findByPk(idOrden);
+
+      // Validar si no se encontró la orden
+      if (!orden) {
+        return null;
+      }
+
+      // Actualizar el campo isActive a false
+      orden.isActive = false;
+      await orden.save();
+
+      return orden;
+    } catch (error) {
+      // Manejo de errores
+      console.error("Error al inactivar la orden:", error);
+      return null;
     }
   }
 }

@@ -170,6 +170,20 @@ class MongoProductosController extends AbstractController {
     }
   }
 
+  public async ActualizarPosicionPatio(id: string, posicion: string) {
+    try {
+      // Cambia 'posicion' por 'posicionPatio' para coincidir con el esquema
+      const updatedOrder = await this.model.findByIdAndUpdate(
+        id,
+        { posicionPatio: posicion }, // Campo correcto
+        { new: true } // Devuelve el documento actualizado
+      );
+      return updatedOrder;
+    } catch (error) {
+      throw new Error(`Error al actualizar la posición de la Orden: ${error}`);
+    }
+  }
+
   private async deletePorId(req: Request, res: Response) {
     try {
       const { id } = req.params;
