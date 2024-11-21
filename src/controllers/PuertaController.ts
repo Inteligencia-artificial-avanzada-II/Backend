@@ -129,6 +129,7 @@ class PuertaController extends AbstractController {
       console.log(puerta);
       if (puerta) {
         await puerta.update({ isOcuppied: false });
+        console.log("Puerta Actualizada", puerta);
         res.status(200).json(puerta);
       } else {
         res.status(404).send("Puerta no encontrada");
