@@ -128,7 +128,7 @@ class PuertaController extends AbstractController {
       const puerta = await db.Puerta.findByPk(id);
       console.log(puerta);
       if (puerta) {
-        await puerta.update({ isOcuppied: false });
+        await puerta.update({ isOccupied: false }, { where: { idPuerta: id } });
         console.log("Puerta Actualizada", puerta);
         res.status(200).json(puerta);
       } else {
