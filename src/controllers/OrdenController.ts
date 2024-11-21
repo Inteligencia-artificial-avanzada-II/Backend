@@ -218,7 +218,7 @@ class OrdenController extends AbstractController {
       );
 
       const ContenedorInstance = ContenedorController.instance;
-      const nuevoStatus = ContenedorInstance.ActualizarStatus(
+      const nuevoStatus = await ContenedorInstance.ActualizarStatus(
         idContenedor,
         "En transito"
       );
