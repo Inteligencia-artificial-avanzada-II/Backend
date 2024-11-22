@@ -7,6 +7,7 @@ import PuertaContenedorController from "./PuertaContenedorController";
 import FosaController from "./NoSql/FosaController";
 import config from "../config/config";
 import OrdenController from "./OrdenController";
+import ContenedorController from "./ContenedorController";
 
 class PuertaController extends AbstractController {
   private static _instance: PuertaController;
@@ -127,13 +128,21 @@ class PuertaController extends AbstractController {
     try {
       const { id } = req.params;
       const { idOrden } = req.body;
+      const { idContenedor } = req.body;
+      const { status } = req.body;
       const puerta = await db.Puerta.findByPk(id);
       if (puerta) {
         await puerta.update({ isOccupied: false }, { where: { idPuerta: id } });
         res.status(200).json(puerta);
         const ordenInstance = OrdenController.instance;
         const ordenInactiva = await ordenInstance.ordenInactiva(idOrden);
+        const contenedorInstance = ContenedorController.instance;
+        const contenedorDisponible = await contenedorInstance.ActualizarStatus(
+          idContenedor,
+          status
+        );
         console.log(ordenInactiva);
+        console.log(contenedorDisponible);
       } else {
         res.status(404).send("Puerta no encontrada");
       }
