@@ -227,7 +227,8 @@ class FosaController extends AbstractController {
       if (daily[fechaHoy]) {
         Object.keys(daily[fechaHoy]).forEach((key) => {
           // Separa el `idContenedor` de la clave `idContenedor-HH:MM`
-          const [contenedorId] = key.split("-");
+          const [contenedorId, _] = key.split("-");
+          console.log("Contenedores: ", contenedorId, idContenedor);
           if (contenedorId === idContenedor && daily[fechaHoy][key] === true) {
             daily[fechaHoy][key] = false; // Actualiza el valor a false
             actualizado = true;
