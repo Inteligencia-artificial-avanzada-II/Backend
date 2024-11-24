@@ -21,3 +21,4 @@ export const BUCKET_NAMESPACE: string = process.env.BUCKET_NAMESPACE || "";
 export const BUCKET_NAME: string = process.env.BUCKET_NAME || "";
 export const QR_KEY: string = process.env.SECRET_SAVE_QR_KEY || "";
 export const BACK_PYTHON: string = process.env.BACK_PYTHON_KEY || "";
+export const TOKEN_NO_EXP: string = process.env.TOKEN_NO_EXP || "";

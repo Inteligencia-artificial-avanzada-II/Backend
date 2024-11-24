@@ -1,4 +1,6 @@
+import { options } from "joi";
 import { Model, Sequelize } from "sequelize";
+import PuertaController from "../controllers/PuertaController";
 
 interface PuertaAttributes {
   idPuerta: number;
@@ -44,6 +46,17 @@ module.exports = (sequelize: Sequelize, DataTypes: any) => {
     {
       sequelize,
       modelName: "Puerta",
+      hooks: {
+        afterUpdate: async (puerta, options) => {
+          const puertaControllerInstance = PuertaController.instance; 
+          // Detecta cambios en `isOccupied` y verifica si es false
+          if (puerta.changed("isOccupied") && puerta.isOccupied === false) {
+            console.log(`Cambio detectado en Puerta ${puerta.idPuerta}`);
+            // Llama al método del controlador pasando el `idPuerta`
+            await puertaControllerInstance.puertaDisponible(puerta.idPuerta);
+          }
+        },
+      },
     }
   );
   return Puerta;

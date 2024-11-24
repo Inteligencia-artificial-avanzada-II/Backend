@@ -1,5 +1,6 @@
 //const express = require("express"); JS
 import express from "express"; //TS
+import { initIo } from "../io/io";
 import AbstractController from "../controllers/AbstractController";
 import db from "../models";
 import connectToMongoDb from "../models/NoSql";
@@ -53,9 +54,13 @@ class Server {
   }
 
   public init() {
-    this.app.listen(this.port, () => {
+    // Inicia el servidor usando app.listen
+    const server = this.app.listen(this.port, () => {
       console.log(`Server running on port ${this.port}`);
     });
+
+    initIo(server)
+
   }
 }
 export default Server;

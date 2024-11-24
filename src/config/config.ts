@@ -13,7 +13,8 @@ import {
   QR_KEY,
   BUCKET_NAMESPACE,
   BUCKET_NAME,
-  BACK_PYTHON
+  BACK_PYTHON,
+  TOKEN_NO_EXP
 } from "./index";
 
 export default {
@@ -29,6 +30,7 @@ export default {
     bucketName: BUCKET_NAME,
     bucketNameSpace: BUCKET_NAMESPACE,
     backPython: BACK_PYTHON,
+    tokenNoExp: TOKEN_NO_EXP,
   },
   test: {
     username: "root",
@@ -42,6 +44,7 @@ export default {
     bucketName: BUCKET_NAME,
     bucketNameSpace: BUCKET_NAMESPACE,
     backPython: BACK_PYTHON,
+    tokenNoExp: TOKEN_NO_EXP,
   },
   production: {
     username: "root",
@@ -55,6 +58,7 @@ export default {
     bucketName: BUCKET_NAME,
     bucketNameSpace: BUCKET_NAMESPACE,
     backPython: BACK_PYTHON,
+    tokenNoExp: TOKEN_NO_EXP,
   },
   oracle: {
     user: USER,

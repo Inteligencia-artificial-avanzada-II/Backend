@@ -131,6 +131,49 @@ class ListaPrioridadContenedorController extends AbstractController {
             return null;
         }
     }
+
+    public async consultarListaPrioridadContenedor(): Promise<string[]> {
+        try {
+            // Obtener solo el primer documento con su campo 'contenedores'
+            const lista = await this.model.findOne().select('contenedores').exec();
+
+            // Si no hay documentos, devolver un arreglo vacío
+            return lista ? lista.contenedores : [];
+        } catch (error) {
+            console.error("Error al consultar la lista de prioridad de contenedores:", error);
+            throw new Error("Error al consultar la lista de prioridad de contenedores.");
+        }
+    }
+
+    public async eliminarContenedor(contenedor: string): Promise<string[]> {
+        try {
+
+            if (contenedor === 'noContainer') {
+                return [];
+            }
+
+            // Buscar el documento con la lista de prioridad
+            const lista = await this.model.findOne();
+
+            if (!lista) {
+                throw new Error("No se encontró una lista de prioridad de contenedores.");
+            }
+
+            // Filtrar el contenedor que se desea eliminar
+            const nuevosContenedores = lista.contenedores.filter(c => c !== contenedor);
+
+            // Actualizar el documento en la base de datos
+            lista.contenedores = nuevosContenedores;
+            await lista.save();
+
+            return nuevosContenedores;
+        } catch (error) {
+            console.error("Error al eliminar el contenedor:", error);
+            throw new Error("Error al eliminar el contenedor.");
+        }
+    }
+
+
 }
 
 export default ListaPrioridadContenedorController;
