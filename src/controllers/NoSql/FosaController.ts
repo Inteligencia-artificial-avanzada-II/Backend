@@ -212,28 +212,22 @@ class FosaController extends AbstractController {
         });
       const fechaHoy = formatoFecha(hoy);
 
-      // Encuentra la fosa actual (suponiendo que solo hay una)
+      // Construir el path dinámico para actualizar los contenedores
       const fosaDocument = await this.model.findOne();
 
       if (!fosaDocument) {
         return res.status(404).send("No se encontró la fosa.");
       }
 
-      // Rutas dinámicas de búsqueda en el documento
+      // Verificar y preparar la actualización
       const daily = fosaDocument.fosa.daily;
       let actualizado = false;
 
-      console.log("Fecha de hoy: ", fechaHoy);
-
-      // Buscar y actualizar el estado del contenedor en la fecha de hoy
       if (daily[fechaHoy]) {
-        console.log("Daily: ", daily[fechaHoy]);
         Object.keys(daily[fechaHoy]).forEach((key) => {
-          // Separa el `idContenedor` de la clave `idContenedor-HH:MM`
-          const [contenedorId, _] = key.split("-");
-          console.log("Contenedores: ", contenedorId, idContenedor);
+          const [contenedorId] = key.split("-");
           if (contenedorId === idContenedor && daily[fechaHoy][key] === true) {
-            daily[fechaHoy][key] = false; // Actualiza el valor a false
+            daily[fechaHoy][key] = false;
             actualizado = true;
           }
         });
@@ -247,9 +241,14 @@ class FosaController extends AbstractController {
           );
       }
 
-      // Guardar los cambios en la base de datos
-      fosaDocument.fosa.daily = daily; // Actualizar el daily modificado en el documento
-      await fosaDocument.save(); // Guardar cambios en la base de datos
+      // Actualización directa con this.model
+      const updatedDocument = await this.model.findByIdAndUpdate(
+        fosaDocument._id,
+        { $set: { [`fosa.daily`]: daily } },
+        { new: true }
+      );
+
+      console.log("updatedDocument", updatedDocument);
 
       res
         .status(200)
