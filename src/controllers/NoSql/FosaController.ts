@@ -22,6 +22,10 @@ class FosaController extends AbstractController {
     // this.router.put('/actualizar/:id', this.putActualizar.bind(this));
     // this.router.delete('/eliminar/:id', this.deletePorId.bind(this));
     this.router.post("/agregarContenedor", this.agregarContenedor.bind(this));
+    this.router.put(
+      "/actualizarEstadoContenedor",
+      this.actualizarEstadoContenedor.bind(this)
+    );
   }
 
   private async agregarContenedor(req: Request, res: Response) {
@@ -129,7 +133,9 @@ class FosaController extends AbstractController {
     try {
       // Validar que se reciban los parámetros necesarios
       if (!dateTime || !idContenedor) {
-        throw new Error("Los parámetros 'dateTime' e 'idContenedor' son obligatorios.");
+        throw new Error(
+          "Los parámetros 'dateTime' e 'idContenedor' son obligatorios."
+        );
       }
 
       // Dividir la fecha y hora del string ISO
@@ -172,16 +178,89 @@ class FosaController extends AbstractController {
       );
 
       if (!updatedDocument) {
-        throw new Error("No se pudo actualizar el documento en la base de datos.");
+        throw new Error(
+          "No se pudo actualizar el documento en la base de datos."
+        );
       }
 
       return updatedDocument; // Devolver el documento actualizado
     } catch (error: any) {
       console.error("Error al agregar el contenedor:", error.message || error);
-      throw new Error(`Error al agregar el contenedor: ${error.message || error}`);
+      throw new Error(
+        `Error al agregar el contenedor: ${error.message || error}`
+      );
     }
   }
 
+  private async actualizarEstadoContenedor(req: Request, res: Response) {
+    try {
+      const { idContenedor } = req.body;
+
+      if (!idContenedor) {
+        return res
+          .status(400)
+          .send("La petición debe contener el campo 'idContenedor'.");
+      }
+
+      // Obtenemos la fecha de hoy en formato "dd/mm/yy"
+      const hoy = new Date();
+      const formatoFecha = (fecha: Date) =>
+        fecha.toLocaleDateString("es-ES", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "2-digit",
+        });
+      const fechaHoy = formatoFecha(hoy);
+
+      // Encuentra la fosa actual (suponiendo que solo hay una)
+      const fosaDocument = await this.model.findOne();
+
+      if (!fosaDocument) {
+        return res.status(404).send("No se encontró la fosa.");
+      }
+
+      // Rutas dinámicas de búsqueda en el documento
+      const daily = fosaDocument.fosa.daily;
+      let actualizado = false;
+
+      // Buscar y actualizar el estado del contenedor en la fecha de hoy
+      if (daily[fechaHoy]) {
+        Object.keys(daily[fechaHoy]).forEach((key) => {
+          if (
+            key.startsWith(`${idContenedor}-`) &&
+            daily[fechaHoy][key] === true
+          ) {
+            daily[fechaHoy][key] = false; // Actualiza el valor a false
+            actualizado = true;
+          }
+        });
+      }
+
+      if (!actualizado) {
+        return res
+          .status(404)
+          .send(
+            `No se encontraron entradas para el contenedor ${idContenedor} con valor true en la fecha ${fechaHoy}.`
+          );
+      }
+
+      // Guardar los cambios en la base de datos
+      await fosaDocument.save();
+
+      res
+        .status(200)
+        .send(
+          `El estado del contenedor ${idContenedor} fue actualizado exitosamente para la fecha ${fechaHoy}.`
+        );
+    } catch (error) {
+      console.error("Error al actualizar el estado del contenedor:", error);
+      res
+        .status(500)
+        .send(
+          `Error al actualizar el estado del contenedor: ${error || error}`
+        );
+    }
+  }
 }
 
 export default FosaController;
