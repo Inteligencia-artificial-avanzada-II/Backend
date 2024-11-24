@@ -211,9 +211,11 @@ class FosaController extends AbstractController {
           year: "2-digit",
         });
       const fechaHoy = formatoFecha(hoy);
+      console.log("Fecha de hoy:", fechaHoy);
 
       // Encuentra la fosa actual (suponiendo que solo hay una)
       const fosaDocument = await this.model.findOne();
+      console.log("Fosa actual:", fosaDocument);
 
       if (!fosaDocument) {
         return res.status(404).send("No se encontró la fosa.");
@@ -221,6 +223,7 @@ class FosaController extends AbstractController {
 
       // Rutas dinámicas de búsqueda en el documento
       const daily = fosaDocument.fosa.daily;
+      console.log("Estado diario:", daily);
       let actualizado = false;
 
       // Buscar y actualizar el estado del contenedor en la fecha de hoy
