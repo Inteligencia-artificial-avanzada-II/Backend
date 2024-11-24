@@ -1,6 +1,6 @@
 import e, { Request, Response } from "express";
 import axios from "axios";
-import moment from 'moment-timezone';
+import moment from "moment-timezone";
 import AbstractController from "./AbstractController";
 import db from "../models";
 import { validateTokenMiddleware } from "../middlewares/validateToken";
@@ -148,6 +148,13 @@ class PuertaController extends AbstractController {
           idContenedor,
           status
         );
+        const puertaContenedorInstance = PuertaContenedorController.instance;
+        const puertaContenedor =
+          await puertaContenedorInstance.actualizarPuertaContenedor(
+            id,
+            idContenedor
+          );
+        console.log(puertaContenedor);
         console.log(ordenInactiva);
         console.log(contenedorDisponible);
       } else {
@@ -202,8 +209,12 @@ class PuertaController extends AbstractController {
 
         try {
           // Añadimos el contenedor a la fosa
-          console.log(dateTime, idContenedor)
-          const agregarContenedor = await fosaControlador.agregarContenedorDirecto(dateTime, idContenedor);
+          console.log(dateTime, idContenedor);
+          const agregarContenedor =
+            await fosaControlador.agregarContenedorDirecto(
+              dateTime,
+              idContenedor
+            );
 
           // Realizamos la petición al modelo de predicción
           const responseModelo = await axios.post(
@@ -282,18 +293,26 @@ class PuertaController extends AbstractController {
       console.log(`Procesando Puerta ${currentPuerta}...`);
 
       // Obteniendo el siguiente contenedor a acomodar
-      const listaPrioridadContenedor = ListaPrioridadContenedorController.instance;
-      const listasPrioridadContenedor = await listaPrioridadContenedor.consultarListaPrioridadContenedor();
+      const listaPrioridadContenedor =
+        ListaPrioridadContenedorController.instance;
+      const listasPrioridadContenedor =
+        await listaPrioridadContenedor.consultarListaPrioridadContenedor();
 
       // Verificar que haya elementos en la lista y obtener el primer elemento
-      const contenedorPrioritario = listasPrioridadContenedor.length > 0 ? listasPrioridadContenedor[0].toString() : null;
+      const contenedorPrioritario =
+        listasPrioridadContenedor.length > 0
+          ? listasPrioridadContenedor[0].toString()
+          : null;
 
       if (contenedorPrioritario && typeof contenedorPrioritario === "string") {
         try {
+          await listaPrioridadContenedor.eliminarContenedor(
+            contenedorPrioritario ? contenedorPrioritario : "noContainer"
+          );
 
-          await listaPrioridadContenedor.eliminarContenedor(contenedorPrioritario ? contenedorPrioritario : "noContainer")
-
-          const dateTimeForSend = moment.tz("America/Mexico_City").format("YYYY-MM-DDTHH:mm:ss[Z]");
+          const dateTimeForSend = moment
+            .tz("America/Mexico_City")
+            .format("YYYY-MM-DDTHH:mm:ss[Z]");
 
           const contenedorPrioritarioNumero = Number(contenedorPrioritario);
 
@@ -312,16 +331,23 @@ class PuertaController extends AbstractController {
           const clients = getClients(); // Obtener el mapa de clientes registrados
 
           // Buscar el socket ID del cliente basado en el uniqueId (contenedorPrioritario)
-          const socketId = clients.get(`contenedor-${contenedorPrioritarioNumero}`);
+          const socketId = clients.get(
+            `contenedor-${contenedorPrioritarioNumero}`
+          );
 
           if (socketId) {
             // Emitir el evento solo al cliente específico
-            io.to(socketId).emit("puertaDesocupada", { idPuerta: currentPuerta });
-            console.log(`Evento 'puertaDesocupada' emitido al cliente ${contenedorPrioritario} para la puerta ${currentPuerta}`);
+            io.to(socketId).emit("puertaDesocupada", {
+              idPuerta: currentPuerta,
+            });
+            console.log(
+              `Evento 'puertaDesocupada' emitido al cliente ${contenedorPrioritario} para la puerta ${currentPuerta}`
+            );
           } else {
-            console.log(`Cliente con ID único ${contenedorPrioritario} no encontrado.`);
+            console.log(
+              `Cliente con ID único ${contenedorPrioritario} no encontrado.`
+            );
           }
-
         } catch (error) {
           console.error(`Error al procesar la Puerta ${currentPuerta}:`, error);
         }
@@ -331,7 +357,6 @@ class PuertaController extends AbstractController {
     // Liberar el bloqueo
     PuertaController.isProcessing = false;
     console.log("Procesamiento de cola completado.");
-
   }
 
   public async acomodarContenedor(
@@ -365,9 +390,12 @@ class PuertaController extends AbstractController {
       const fosaControlador = FosaController.instance;
 
       try {
-        console.log(dateTime, idContenedor.toString())
+        console.log(dateTime, idContenedor.toString());
         // Añadir el contenedor a la fosa
-        await fosaControlador.agregarContenedorDirecto(dateTime, idContenedor.toString());
+        await fosaControlador.agregarContenedorDirecto(
+          dateTime,
+          idContenedor.toString()
+        );
 
         // Realizar la petición al modelo de predicción
         const headersForSent = {
@@ -417,13 +445,10 @@ class PuertaController extends AbstractController {
         return { puerta, puertacontenedor };
       } catch (error) {
         console.error("Error al asignar contenedor a la puerta:", error);
-        throw new Error(
-          `Error al asignar contenedor a la puerta: ${error}`
-        );
+        throw new Error(`Error al asignar contenedor a la puerta: ${error}`);
       }
     }
   }
-
 }
 
 export default PuertaController;

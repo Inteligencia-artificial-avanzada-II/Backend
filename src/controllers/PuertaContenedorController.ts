@@ -112,6 +112,36 @@ class PuertaContenedorController extends AbstractController {
     }
   }
 
+  public async actualizarPuertaContenedor(
+    idPuerta: string,
+    idContenedor: string
+  ) {
+    try {
+      // Buscar el registro con isActive: true, idPuerta y idContenedor específicos
+      const registro = await db.PuertaContenedor.findOne({
+        where: {
+          idPuerta,
+          idContenedor,
+          isActive: true,
+        },
+      });
+
+      // Si no se encuentra el registro, arroja un error
+      if (!registro) {
+        throw new Error(
+          "No se encontró un registro activo con los datos proporcionados."
+        );
+      }
+
+      // Actualizar el campo isActive a false
+      await registro.update({ isActive: false });
+
+      return `Registro con idPuerta: ${idPuerta} y idContenedor: ${idContenedor} desactivado correctamente.`;
+    } catch (error) {
+      throw new Error(`Error al actualizar PuertaContenedor: ${error}`);
+    }
+  }
+
   private async deletePorId(req: Request, res: Response) {
     try {
       await db.PuertaContenedor.destroy({ where: { id: req.params.id } });
