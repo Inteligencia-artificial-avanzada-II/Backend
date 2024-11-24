@@ -36,7 +36,7 @@ const OrderSchema = new Schema<Order>(
     modifiedBy: { type: String, required: true },
     creationDate: { type: String, required: true },
     fechaSalida: { type: String, required: true },
-    posicionPatio: { type: String, required: true },
+    posicionPatio: { type: String, required: false },
     products: { type: [ProductSchema], required: true },
   },
   {
