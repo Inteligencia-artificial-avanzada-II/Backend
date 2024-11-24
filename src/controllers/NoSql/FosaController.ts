@@ -223,15 +223,11 @@ class FosaController extends AbstractController {
       const daily = fosaDocument.fosa.daily;
       let actualizado = false;
 
-      console.log("daily", daily[fechaHoy]);
-
       // Buscar y actualizar el estado del contenedor en la fecha de hoy
       if (daily[fechaHoy]) {
         Object.keys(daily[fechaHoy]).forEach((key) => {
           // Separa el `idContenedor` de la clave `idContenedor-HH:MM`
           const [contenedorId] = key.split("-");
-          console.log("contenedorId", contenedorId);
-          console.log("dailyyyyy", daily[fechaHoy][key]);
           if (contenedorId === idContenedor && daily[fechaHoy][key] === true) {
             daily[fechaHoy][key] = false; // Actualiza el valor a false
             actualizado = true;
@@ -248,7 +244,8 @@ class FosaController extends AbstractController {
       }
 
       // Guardar los cambios en la base de datos
-      await fosaDocument.save();
+      fosaDocument.fosa.daily = daily; // Actualizar el daily modificado en el documento
+      await fosaDocument.save(); // Guardar cambios en la base de datos
 
       res
         .status(200)
