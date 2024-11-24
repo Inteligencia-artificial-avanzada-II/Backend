@@ -135,6 +135,30 @@ class CamionController extends AbstractController {
     }
   }
 
+  public actualizarOcupacionCamion = async (
+    idCamion: string,
+    isOccupied: boolean
+  ) => {
+    /**
+     * Actualiza la disponibilidad de un camión en la base de datos.
+     *
+     * @param {string} idCamion - El ID del camión a actualizar.
+     * @param {boolean} isOccupied - El estado de ocupación del camión.
+     * @returns {Promise<void>} No devuelve ningún valor directamente. Envía una respuesta HTTP al cliente.
+     */
+
+    try {
+      const camion = await db.Camion.findByPk(idCamion);
+      if (!camion) {
+        return;
+      }
+      camion.isOccupied = isOccupied;
+      await camion.save();
+    } catch (error) {
+      console.error(`Error al actualizar la ocupación del camión: ${error}`);
+    }
+  };
+
   private async getNotDisponibles(req: Request, res: Response) {
     /**
      * Obtiene todos los camiones no disponibles de la base de datos.

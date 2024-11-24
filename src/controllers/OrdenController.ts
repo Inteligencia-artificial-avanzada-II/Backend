@@ -12,6 +12,7 @@ import { ConfigFileAuthenticationDetailsProvider } from "oci-common";
 import { ObjectStorageClient } from "oci-objectstorage";
 import { BUCKET_NAME, BUCKET_NAMESPACE } from "../config";
 import ContenedorController from "./ContenedorController";
+import CamionController from "./CamionController";
 
 class OrdenController extends AbstractController {
   private static _instance: OrdenController;
@@ -184,6 +185,12 @@ class OrdenController extends AbstractController {
 
       const userInstance = UsuarioController.instance;
       const userId = await userInstance.getPublicPorId(idUser);
+
+      const camionInstance = CamionController.instance;
+      const camion = await camionInstance.actualizarOcupacionCamion(
+        sqlData.idCamion,
+        true
+      );
 
       if (!userId) {
         return res.status(400).json({
