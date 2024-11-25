@@ -205,10 +205,11 @@ class FosaController extends AbstractController {
       // Obtenemos la fecha de hoy en formato "dd/mm/yy"
       const hoy = new Date();
       const formatoFecha = (fecha: Date) =>
-        fecha.toLocaleDateString("es-ES", {
+        fecha.toLocaleDateString("es-MX", {
           day: "2-digit",
           month: "2-digit",
           year: "2-digit",
+          timeZone: "America/Mexico_City", // Asegúrate de usar el huso horario correcto
         });
       const fechaHoy = formatoFecha(hoy);
 
@@ -271,10 +272,11 @@ class FosaController extends AbstractController {
   }> {
     const hoy = new Date();
     const formatoFecha = (fecha: Date) =>
-      fecha.toLocaleDateString("es-ES", {
+      fecha.toLocaleDateString("es-MX", {
         day: "2-digit",
         month: "2-digit",
         year: "2-digit",
+        timeZone: "America/Mexico_City", // Asegúrate de usar el huso horario correcto
       });
     const fechaHoy = formatoFecha(hoy);
 
