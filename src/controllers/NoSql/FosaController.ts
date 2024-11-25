@@ -286,12 +286,15 @@ class FosaController extends AbstractController {
 
       // Verificar si existe la fecha de hoy en el daily
       const daily = fosaDocument.fosa.daily;
+      console.log("daily", daily);
       const contenedoresHoy = daily[fechaHoy] || {};
 
       // Extraer solo los idContenedores sin la hora
       const idContenedores = Object.keys(contenedoresHoy).map(
         (key) => key.split("-")[0]
       );
+
+      console.log("idContenedores", idContenedores);
 
       return idContenedores;
     } catch (error) {

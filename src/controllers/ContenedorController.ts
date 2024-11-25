@@ -64,7 +64,7 @@ class ContenedorController extends AbstractController {
       this.postTokenSinExpiracion.bind(this)
     );
     this.router.get(
-      "/enTransitoYDescargando",
+      "/enTransitoDescargandoFosa",
       validateTokenMiddleware,
       this.getEnTransitoDescargandoFosa.bind(this)
     );
