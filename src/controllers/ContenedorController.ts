@@ -3,6 +3,7 @@ import AbstractController from "./AbstractController";
 import db from "../models";
 import { createJWT, validateJWT, createJWTAdmin } from "../utils/jwt";
 import { validateTokenMiddleware } from "../middlewares/validateToken";
+import FosaController from "./NoSql/FosaController";
 
 class ContenedorController extends AbstractController {
   private static _instance: ContenedorController;
@@ -61,6 +62,11 @@ class ContenedorController extends AbstractController {
       "/admintoken",
       validateTokenMiddleware,
       this.postTokenSinExpiracion.bind(this)
+    );
+    this.router.get(
+      "/enTransitoYDescargando",
+      validateTokenMiddleware,
+      this.getEnTransitoDescargandoFosa.bind(this)
     );
   }
 
@@ -283,6 +289,31 @@ class ContenedorController extends AbstractController {
       });
     } catch (error) {
       res.status(500).send(`Error al hacer login: ${error}`);
+    }
+  }
+
+  private async getEnTransitoDescargandoFosa(req: Request, res: Response) {
+    try {
+      const transito = await db.Contenedor.findAll({
+        where: {
+          status: ["En transito"],
+        },
+      });
+
+      const descargando = await db.Contenedor.findAll({
+        where: {
+          status: "Descargando",
+        },
+      });
+
+      const fosaInstance = FosaController.instance;
+      const fosa = await fosaInstance.obtenerContenedoresHoy();
+
+      res.status(200).json({ transito, descargando, fosa });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: `Error al consultar los Contenedores: ${error}` });
     }
   }
 }
