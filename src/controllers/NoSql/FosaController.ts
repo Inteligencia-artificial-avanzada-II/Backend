@@ -265,41 +265,36 @@ class FosaController extends AbstractController {
     }
   }
 
-  public async obtenerContenedoresHoy() {
-    try {
-      // Obtener la fecha de hoy en formato "dd/mm/yy"
-      const hoy = new Date();
-      const formatoFecha = (fecha: Date) =>
-        fecha.toLocaleDateString("es-ES", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "2-digit",
-        });
-      const fechaHoy = formatoFecha(hoy);
+  public async obtenerContenedoresHoy(): Promise<{
+    fecha: string;
+    idContenedores: string[];
+  }> {
+    const hoy = new Date();
+    const formatoFecha = (fecha: Date) =>
+      fecha.toLocaleDateString("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+      });
+    const fechaHoy = formatoFecha(hoy);
 
-      // Buscar el documento de la fosa
-      const fosaDocument = await this.model.findOne();
-
-      if (!fosaDocument) {
-        return "No se encontró la fosa.";
-      }
-
-      // Verificar si existe la fecha de hoy en el daily
-      const daily = fosaDocument.fosa.daily;
-      const contenedoresHoy = daily[fechaHoy] || {};
-
-      // Extraer solo los idContenedores sin la hora
-      const idContenedores = Object.keys(contenedoresHoy).map((key) =>
-        key.split("-")
-      );
-
-      console.log("idContenedores", idContenedores);
-
-      return idContenedores;
-    } catch (error) {
-      console.error("Error al obtener los contenedores de hoy:", error);
-      return `Error al obtener los contenedores de hoy: ${error}`;
+    const fosaDocument = await this.model.findOne();
+    if (!fosaDocument) {
+      throw new Error("No se encontró la fosa.");
     }
+
+    const daily = fosaDocument.fosa.daily;
+    const contenedoresHoy = daily[fechaHoy] || {};
+
+    // Extraer solo los idContenedores sin la hora
+    const idContenedores = Array.from(
+      new Set(Object.keys(contenedoresHoy).map((key) => key.split("-")[0]))
+    );
+
+    return {
+      fecha: fechaHoy,
+      idContenedores,
+    };
   }
 }
 
