@@ -10,7 +10,7 @@ import FosaController from "./NoSql/FosaController";
 import config from "../config/config";
 import OrdenController from "./OrdenController";
 import ContenedorController from "./ContenedorController";
-import { getIo, getClients } from "../io/io";
+import { getIo, getClients, getFrontendAdmins } from "../io/io";
 
 class PuertaController extends AbstractController {
   // Variables globales para manejar la cola de acomodo de contenedores en puertas disponibles
@@ -140,7 +140,6 @@ class PuertaController extends AbstractController {
       const puerta = await db.Puerta.findByPk(id);
       if (puerta) {
         await puerta.update({ isOccupied: false }, { where: { idPuerta: id } });
-        res.status(200).json(puerta);
         const ordenInstance = OrdenController.instance;
         const ordenInactiva = await ordenInstance.ordenInactiva(idOrden);
         const contenedorInstance = ContenedorController.instance;
@@ -161,11 +160,12 @@ class PuertaController extends AbstractController {
         console.log(puertaContenedor);
         console.log(ordenInactiva);
         console.log(contenedorDisponible);
+        return res.status(200).json(puerta);
       } else {
-        res.status(404).send("Puerta no encontrada");
+        return res.status(404).send("Puerta no encontrada");
       }
     } catch (error) {
-      res.status(500).send(`Error al actualizar la Puerta ${error}`);
+      return res.status(500).send(`Error al actualizar la Puerta ${error}`);
     }
   }
 
@@ -323,16 +323,22 @@ class PuertaController extends AbstractController {
           if (isNaN(contenedorPrioritarioNumero)) {
             console.log("El contenedor prioritario no es un número válido.");
           } else {
-            const acomodaContenedor = await this.acomodarContenedor(
+            const acomodaContenedorObject = await this.acomodarContenedor(
               contenedorPrioritarioNumero,
               dateTimeForSend,
               config.development.tokenNoExp
             );
+
+            if (!acomodaContenedorObject) {
+              console.log("No se pudo acomodar el contenedor")
+              return;
+            }
           }
 
           // Inicialización de IO
           const io = getIo();
           const clients = getClients(); // Obtener el mapa de clientes registrados
+          const frontendAdmins = getFrontendAdmins(); // Obtenemos todos los clientes que estén conectados desde la web
 
           // Buscar el socket ID del cliente basado en el uniqueId (contenedorPrioritario)
           const socketId = clients.get(
@@ -347,6 +353,10 @@ class PuertaController extends AbstractController {
             console.log(
               `Evento 'puertaDesocupada' emitido al cliente ${contenedorPrioritario} para la puerta ${currentPuerta}`
             );
+            frontendAdmins.forEach((socketId) => {
+              io.to(socketId).emit("puertaDesocupada", { idPuerta: currentPuerta });
+              console.log(`Evento 'puertaDesocupada' enviado al frontend-admin con socket ID: ${socketId}`);
+            });
           } else {
             console.log(
               `Cliente con ID único ${contenedorPrioritario} no encontrado.`
@@ -361,6 +371,8 @@ class PuertaController extends AbstractController {
     // Liberar el bloqueo
     PuertaController.isProcessing = false;
     console.log("Procesamiento de cola completado.");
+
+    return;
   }
 
   public async acomodarContenedor(

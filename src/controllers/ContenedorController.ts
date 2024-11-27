@@ -68,6 +68,7 @@ class ContenedorController extends AbstractController {
       validateTokenMiddleware,
       this.getEnTransitoDescargandoFosa.bind(this)
     );
+    this.router.post("/obtenerContenedoresList", this.postObtenerContenedoresInfoList.bind(this));
   }
 
   private async getTest(req: Request, res: Response) {
@@ -316,6 +317,46 @@ class ContenedorController extends AbstractController {
         .json({ error: `Error al consultar los Contenedores: ${error}` });
     }
   }
+
+  private async postObtenerContenedoresInfoList(req: Request, res: Response) {
+    try {
+
+      const { contenedoresList } = req.body;
+
+      if (!Array.isArray(contenedoresList)) {
+        return res.status(400).json({ error: "La lista de contenedores es inválida o está vacía" });
+      }
+
+      if (contenedoresList.length === 0) {
+        return res.status(200).json({ data: [] });
+      }
+
+      // Consultar los contenedores cuyos IDs están en la lista
+      const contenedores = await db.Contenedor.findAll({
+        where: {
+          idContenedor: contenedoresList, // Filtrar por los IDs recibidos en la lista
+        },
+      });
+
+      if (contenedores.length === 0) {
+        return res.status(404).json({ message: "No se encontraron contenedores disponibles con los IDs proporcionados" });
+      }
+
+      // Ordenar los contenedores según el orden de contenedoresList
+      const contenedoresOrdenados = contenedores.sort((a: any, b: any) => {
+        const indexA = contenedoresList.indexOf(a.dataValues.idContenedor.toString());
+        const indexB = contenedoresList.indexOf(b.dataValues.idContenedor.toString());
+        return indexA - indexB;
+      });
+
+      // Devolver los contenedores encontrados y ordenados
+      return res.status(200).json({ data: contenedoresOrdenados });
+    } catch (error) {
+      return res.status(500).json({ error: `Error al consultar los Contenedores: ${error}` });
+    }
+  }
+
+
 }
 
 export default ContenedorController;

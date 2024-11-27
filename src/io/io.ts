@@ -5,6 +5,7 @@ let io: SocketIOServer | null = null;
 
 // Mapa para almacenar la relación entre ID único y socket ID
 const clients = new Map<string, string>();
+const frontendAdmins = new Set<string>();
 
 
 export function initIo(server: HttpServer): void {
@@ -31,8 +32,16 @@ export function initIo(server: HttpServer): void {
         // Escuchar evento para registrar un cliente con su ID único
         socket.on("register", (uniqueId: string) => {
             console.log(`Registro del cliente con ID único: ${uniqueId}`);
-            clients.set(uniqueId, socket.id);
-            console.log(clients)
+            if (uniqueId === "frontend-admin") {
+                frontendAdmins.add(socket.id); // Registrar en el Set de frontend-admin
+                console.log("Frontend-admin registrado:", socket.id);
+            } else {
+                clients.set(uniqueId, socket.id); // Registrar en el Map de clientes estándar
+                console.log("Cliente registrado en el mapa de clientes:", uniqueId, socket.id);
+            }
+
+            console.log("Estado actual del mapa de clientes:", clients);
+            console.log("Estado actual de los frontend-admins:", frontendAdmins);
         });
 
         // Escuchar eventos de mensaje desde el cliente
@@ -44,7 +53,7 @@ export function initIo(server: HttpServer): void {
         socket.on("disconnect", () => {
             console.log("Cliente desconectado:", socket.id);
 
-            // Eliminar el cliente del mapa al desconectarse
+            // Eliminar del mapa de clientes
             for (const [key, value] of clients.entries()) {
                 if (value === socket.id) {
                     clients.delete(key);
@@ -52,7 +61,15 @@ export function initIo(server: HttpServer): void {
                     break;
                 }
             }
-            console.log(clients)
+
+            // Eliminar del Set de frontend-admin
+            if (frontendAdmins.has(socket.id)) {
+                frontendAdmins.delete(socket.id);
+                console.log(`Frontend-admin con socket ID ${socket.id} eliminado.`);
+            }
+
+            console.log("Estado actual del mapa de clientes:", clients);
+            console.log("Estado actual de los frontend-admins:", frontendAdmins);
         });
     });
 }
@@ -75,4 +92,8 @@ export function getClients(): Map<string, string> {
     * @returns Mapa de clientes (ID único -> socket ID)
     */
     return clients;
+}
+
+export function getFrontendAdmins(): Set<string> {
+    return frontendAdmins;
 }
