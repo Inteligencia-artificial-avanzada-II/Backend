@@ -5,6 +5,7 @@ import {
 } from "../../models/NoSql/MongoProductosModel"; // Importamos la interfaz Order también
 import AbstractController from "../AbstractController";
 import { validateTokenMiddleware } from "../../middlewares/validateToken";
+import OrdenController from "../OrdenController";
 
 class MongoProductosController extends AbstractController {
   // Cambiamos 'typeof OrderModel' a 'Order'
@@ -51,6 +52,7 @@ class MongoProductosController extends AbstractController {
       validateTokenMiddleware,
       this.deletePorId.bind(this)
     );
+    this.router.put("/guardarPosicionPatio", validateTokenMiddleware, this.putGuardarPosicionPatio.bind(this));
   }
 
   // Métodos privados
@@ -129,6 +131,32 @@ class MongoProductosController extends AbstractController {
       res
         .status(500)
         .json({ message: `Error al consultar la Orden: ${error}`, data: {} });
+    }
+  }
+
+  private async putGuardarPosicionPatio(req: Request, res: Response) {
+    const { idOrden, posicionPatio } = req.body;
+
+    try {
+      const controladorOrden = OrdenController.instance;
+      const ordenObject = await controladorOrden.getOrdenById(idOrden)
+
+      if (ordenObject?.data) {
+        console.log(ordenObject.data)
+        const mongoIdContenedor = ordenObject.data.idMongoProductos
+
+        const actualizaPatio = await this.ActualizarPosicionPatio(mongoIdContenedor, posicionPatio)
+
+        const responseToSend = {
+          idOrden: idOrden,
+          ordenMongo: actualizaPatio
+        }
+
+        res.status(200).json({ message: "Datos Modificados Correctamente", data: responseToSend })
+      }
+
+    } catch (error) {
+      res.status(404).json({ message: `Ocurrió un error al guardar la posición en el patio ${error}` })
     }
   }
 

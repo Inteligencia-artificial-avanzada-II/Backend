@@ -711,6 +711,24 @@ class OrdenController extends AbstractController {
       return null;
     }
   }
+
+  public async getOrdenById(idOrden: string) {
+    try {
+      const orden = await db.Orden.findByPk(idOrden);
+      if (!orden) {
+        return {
+          message: `Orden con id ${idOrden} no encontrada`,
+          data: {},
+        };
+      }
+      return{
+        message: "Orden consultada exitosamente",
+        data: orden,
+      };
+    } catch (error) {
+      
+    }
+  }
 }
 
 export default OrdenController;
