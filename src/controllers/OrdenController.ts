@@ -111,6 +111,10 @@ class OrdenController extends AbstractController {
       "/actualizarCamion/:idOrden",
       this.actualizarEstadoCamion.bind(this)
     );
+    this.router.get(
+      "/obtenerOrdenesInfoContenedor",
+      this.getOrdenesFront.bind(this)
+    );
   }
 
   private async getTest(req: Request, res: Response) {
@@ -809,6 +813,49 @@ class OrdenController extends AbstractController {
       };
     } catch (error) {
       return { message: `Error al actualizar el estado del camión: ${error}` };
+    }
+  }
+
+  private async getOrdenesFront(req: Request, res: Response) {
+    try {
+      // Obtén todas las órdenes activas por el ID proporcionado
+      const ordenes = await db.Orden.findAll({
+        where: {
+          isActive: true,
+        },
+      });
+
+      // Si no hay órdenes, devuelve una respuesta vacía
+      if (ordenes.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No se encontraron órdenes activas." });
+      }
+
+      // Recorre las órdenes y llama a `porId` y busca el contenedor asociado
+      const resultados = await Promise.all(
+        ordenes.map(async (orden: any) => {
+          const MongoProductosControllerInstance =
+            MongoProductosController.instance;
+          const idMongoProductos = await MongoProductosControllerInstance.porId(
+            orden.idMongoProductos
+          );
+          const contenedor = await db.Contenedor.findByPk(orden.idContenedor);
+
+          return {
+            ...orden.toJSON(), // Incluye los datos originales de la orden
+            idMongoProductos, // Agrega los datos de `idMongoProductos`
+            contenedor, // Agrega los datos del contenedor
+          };
+        })
+      );
+
+      // Responde con la lista combinada
+      res.status(200).json(resultados);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: `Error al consultar las órdenes: ${error}` });
     }
   }
 }

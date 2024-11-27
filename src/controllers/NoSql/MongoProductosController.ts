@@ -6,6 +6,7 @@ import {
 import AbstractController from "../AbstractController";
 import { validateTokenMiddleware } from "../../middlewares/validateToken";
 import OrdenController from "../OrdenController";
+import { read } from "fs";
 
 class MongoProductosController extends AbstractController {
   // Cambiamos 'typeof OrderModel' a 'Order'
@@ -52,7 +53,11 @@ class MongoProductosController extends AbstractController {
       validateTokenMiddleware,
       this.deletePorId.bind(this)
     );
-    this.router.put("/guardarPosicionPatio", validateTokenMiddleware, this.putGuardarPosicionPatio.bind(this));
+    this.router.put(
+      "/guardarPosicionPatio",
+      validateTokenMiddleware,
+      this.putGuardarPosicionPatio.bind(this)
+    );
   }
 
   // Métodos privados
@@ -134,29 +139,52 @@ class MongoProductosController extends AbstractController {
     }
   }
 
+  public async porId(id: string) {
+    try {
+      const idMongoProductos = await this.model.findById(id);
+      if (!idMongoProductos) {
+        return "No se encontró el id";
+      }
+      return idMongoProductos;
+    } catch (error) {
+      return "Error al consultar el id";
+    }
+  }
+
   private async putGuardarPosicionPatio(req: Request, res: Response) {
     const { idOrden, posicionPatio } = req.body;
 
     try {
       const controladorOrden = OrdenController.instance;
-      const ordenObject = await controladorOrden.getOrdenById(idOrden)
+      const ordenObject = await controladorOrden.getOrdenById(idOrden);
 
       if (ordenObject?.data) {
-        console.log(ordenObject.data)
-        const mongoIdContenedor = ordenObject.data.idMongoProductos
+        console.log(ordenObject.data);
+        const mongoIdContenedor = ordenObject.data.idMongoProductos;
 
-        const actualizaPatio = await this.ActualizarPosicionPatio(mongoIdContenedor, posicionPatio)
+        const actualizaPatio = await this.ActualizarPosicionPatio(
+          mongoIdContenedor,
+          posicionPatio
+        );
 
         const responseToSend = {
           idOrden: idOrden,
-          ordenMongo: actualizaPatio
-        }
+          ordenMongo: actualizaPatio,
+        };
 
-        res.status(200).json({ message: "Datos Modificados Correctamente", data: responseToSend })
+        res
+          .status(200)
+          .json({
+            message: "Datos Modificados Correctamente",
+            data: responseToSend,
+          });
       }
-
     } catch (error) {
-      res.status(404).json({ message: `Ocurrió un error al guardar la posición en el patio ${error}` })
+      res
+        .status(404)
+        .json({
+          message: `Ocurrió un error al guardar la posición en el patio ${error}`,
+        });
     }
   }
 
