@@ -288,9 +288,13 @@ class FosaController extends AbstractController {
     const daily = fosaDocument.fosa.daily;
     const contenedoresHoy = daily[fechaHoy] || {};
 
-    // Extraer solo los idContenedores sin la hora
+    // Filtrar los contenedores cuyos valores sean true
     const idContenedores = Array.from(
-      new Set(Object.keys(contenedoresHoy).map((key) => key.split("-")[0]))
+      new Set(
+        Object.keys(contenedoresHoy)
+          .filter((key) => contenedoresHoy[key] === true) // Solo incluir claves con valores true
+          .map((key) => key.split("-")[0]) // Extraer solo el ID antes del guion
+      )
     );
 
     return {
