@@ -292,6 +292,8 @@ class PuertaController extends AbstractController {
 
     // Procesar la cola
     PuertaController.isProcessing = true;
+
+    const fosaControlador = FosaController.instance;
     while (PuertaController.processingQueue.length > 0) {
       const currentPuerta = PuertaController.processingQueue.shift();
       console.log(`Procesando Puerta ${currentPuerta}...`);
@@ -346,6 +348,7 @@ class PuertaController extends AbstractController {
           );
 
           if (socketId) {
+            await fosaControlador.actualizarEstadoContenedorPublic(contenedorPrioritario)
             // Emitir el evento solo al cliente específico
             io.to(socketId).emit("puertaDesocupada", {
               idPuerta: currentPuerta,

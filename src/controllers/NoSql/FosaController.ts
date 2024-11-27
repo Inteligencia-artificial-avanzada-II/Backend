@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { MongoFosasModel } from "../../models/NoSql/FosaModel";
 import AbstractController from "../AbstractController";
+import { number } from "joi";
 
 class FosaController extends AbstractController {
   private static _instance: FosaController;
@@ -263,6 +264,65 @@ class FosaController extends AbstractController {
         .send(
           `Error al actualizar el estado del contenedor: ${error || error}`
         );
+    }
+  }
+
+  public async actualizarEstadoContenedorPublic(idContenedor: string) {
+    try {
+
+      if (!idContenedor) {
+        return {};
+      }
+
+      // Obtenemos la fecha de hoy en formato "dd/mm/yy"
+      const hoy = new Date();
+      const formatoFecha = (fecha: Date) =>
+        fecha.toLocaleDateString("es-MX", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "2-digit",
+          timeZone: "America/Mexico_City", // Asegúrate de usar el huso horario correcto
+        });
+      const fechaHoy = formatoFecha(hoy);
+
+      // Construir el path dinámico para actualizar los contenedores
+      const fosaDocument = await this.model.findOne();
+
+      if (!fosaDocument) {
+        return {};
+      }
+
+      // Verificar y preparar la actualización
+      const daily = fosaDocument.fosa.daily;
+      let actualizado = false;
+
+      if (daily[fechaHoy]) {
+        Object.keys(daily[fechaHoy]).forEach((key) => {
+          const [contenedorId, _] = key.split("-");
+          if (contenedorId === idContenedor && daily[fechaHoy][key] === true) {
+            daily[fechaHoy][key] = false;
+            actualizado = true;
+          }
+        });
+      }
+
+      if (!actualizado) {
+        return {};
+      }
+
+      // Actualización directa con this.model
+      const updatedDocument = await this.model.findByIdAndUpdate(
+        fosaDocument._id,
+        { $set: { [`fosa.daily`]: daily } },
+        { new: true }
+      );
+
+      console.log("updatedDocument", updatedDocument);
+
+      return updatedDocument
+    } catch (error) {
+      console.error("Error al actualizar el estado del contenedor:", error);
+      return {}
     }
   }
 
