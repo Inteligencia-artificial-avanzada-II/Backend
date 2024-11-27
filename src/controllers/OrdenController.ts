@@ -818,7 +818,7 @@ class OrdenController extends AbstractController {
 
   private async getOrdenesFront(req: Request, res: Response) {
     try {
-      // Obtén todas las órdenes activas por el ID proporcionado
+      // Obtén todas las órdenes activas
       const ordenes = await db.Orden.findAll({
         where: {
           isActive: true,
@@ -837,15 +837,24 @@ class OrdenController extends AbstractController {
         ordenes.map(async (orden: any) => {
           const MongoProductosControllerInstance =
             MongoProductosController.instance;
+
+          // Obtiene los datos de `idMongoProductos`
           const idMongoProductos = await MongoProductosControllerInstance.porId(
             orden.idMongoProductos
           );
+
+          // Obtiene los datos del contenedor asociado
           const contenedor = await db.Contenedor.findByPk(orden.idContenedor);
+
+          // Elimina el campo "contraseña" del contenedor si existe
+          if (contenedor) {
+            delete contenedor.dataValues.contraseña;
+          }
 
           return {
             ...orden.toJSON(), // Incluye los datos originales de la orden
             idMongoProductos, // Agrega los datos de `idMongoProductos`
-            contenedor, // Agrega los datos del contenedor
+            contenedor, // Agrega los datos del contenedor (sin contraseña)
           };
         })
       );
