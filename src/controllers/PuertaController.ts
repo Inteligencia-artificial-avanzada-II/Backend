@@ -154,6 +154,10 @@ class PuertaController extends AbstractController {
             id,
             idContenedor
           );
+
+        const camionDesocupado =
+          ordenInstance.actualizarEstadoCamionFinal(idOrden);
+        console.log(camionDesocupado);
         console.log(puertaContenedor);
         console.log(ordenInactiva);
         console.log(contenedorDisponible);

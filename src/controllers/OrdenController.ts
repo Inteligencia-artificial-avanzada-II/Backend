@@ -771,6 +771,46 @@ class OrdenController extends AbstractController {
       });
     }
   }
+
+  public async actualizarEstadoCamionFinal(idOrden: string) {
+    try {
+      // Busca la orden por idOrden
+      const orden = await db.Orden.findByPk(idOrden);
+      if (!orden) {
+        return { message: `Orden con id ${idOrden} no encontrada.` };
+      }
+
+      // Obtiene el idCamion asociado
+      const { idCamion } = orden;
+
+      // Busca el camión por idCamion
+      const camion = await db.Camion.findByPk(idCamion);
+      if (!camion) {
+        return { message: `Camion con id ${idCamion} no encontrado.` };
+      }
+
+      // Verifica el estado actual de isOccupied
+      if (!camion.isOccupied) {
+        return {
+          message: `El camión con id ${idCamion} ya está marcado como no ocupado.`,
+          camion,
+        };
+      }
+
+      // Actualiza el estado de isOccupied a false
+      camion.isOccupied = false;
+      await camion.save();
+
+      // Devuelve la orden completa junto con el estado actualizado del camión
+      return {
+        message: "Estado del camión actualizado exitosamente.",
+        orden,
+        camion,
+      };
+    } catch (error) {
+      return { message: `Error al actualizar el estado del camión: ${error}` };
+    }
+  }
 }
 
 export default OrdenController;
