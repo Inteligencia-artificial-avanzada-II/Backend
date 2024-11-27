@@ -107,6 +107,10 @@ class OrdenController extends AbstractController {
       "/ordenInactiva/:idOrden",
       this.putOrdenInactiva.bind(this)
     );
+    this.router.put(
+      "/actualizarCamion/:idOrden",
+      this.actualizarEstadoCamion.bind(this)
+    );
   }
 
   private async getTest(req: Request, res: Response) {
@@ -721,12 +725,50 @@ class OrdenController extends AbstractController {
           data: {},
         };
       }
-      return{
+      return {
         message: "Orden consultada exitosamente",
         data: orden,
       };
+    } catch (error) {}
+  }
+
+  private async actualizarEstadoCamion(req: Request, res: Response) {
+    try {
+      const { idOrden } = req.params;
+
+      // Busca la orden por idOrden
+      const orden = await db.Orden.findByPk(idOrden);
+      if (!orden) {
+        return res
+          .status(404)
+          .json({ message: `Orden con id ${idOrden} no encontrada.` });
+      }
+
+      // Obtiene el idCamion asociado
+      const { idCamion } = orden;
+
+      // Busca el camión por idCamion
+      const camion = await db.Camion.findByPk(idCamion);
+      if (!camion) {
+        return res
+          .status(404)
+          .json({ message: `Camion con id ${idCamion} no encontrado.` });
+      }
+
+      // Actualiza el estado de isOccupied a false
+      camion.isOccupied = false;
+      await camion.save();
+
+      // Devuelve la orden completa junto con el estado actualizado del camión
+      res.status(200).json({
+        message: "Estado del camión actualizado exitosamente.",
+        orden,
+        camion,
+      });
     } catch (error) {
-      
+      res.status(500).json({
+        message: `Error al actualizar el estado del camión: ${error}`,
+      });
     }
   }
 }
