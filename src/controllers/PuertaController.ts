@@ -354,7 +354,7 @@ class PuertaController extends AbstractController {
               `Evento 'puertaDesocupada' emitido al cliente ${contenedorPrioritario} para la puerta ${currentPuerta}`
             );
             frontendAdmins.forEach((socketId) => {
-              io.to(socketId).emit("puertaDesocupada", { idPuerta: currentPuerta });
+              io.to(socketId).emit("puertaDesocupada", { idPuerta: currentPuerta, idContenedor: contenedorPrioritarioNumero });
               console.log(`Evento 'puertaDesocupada' enviado al frontend-admin con socket ID: ${socketId}`);
             });
           } else {
