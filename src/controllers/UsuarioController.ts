@@ -14,6 +14,7 @@ class UsuarioController extends AbstractController {
     return this._instance;
   }
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
     this.router.post(
@@ -53,10 +54,13 @@ class UsuarioController extends AbstractController {
 
   private async getTest(req: Request, res: Response) {
     /**
-     * Prueba de conexión con el controlador
-     * @param - None
-     * @returns - None
-     */
+      * Prueba de conexión con el controlador.
+      *
+      * @param req - Objeto de solicitud HTTP.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje indicando que la conexión funciona o un mensaje de error.
+    */
+
     try {
       res.status(200).send("Usuario Works");
     } catch (error) {
@@ -65,6 +69,20 @@ class UsuarioController extends AbstractController {
   }
 
   private async postCrear(req: Request, res: Response) {
+    /**
+      * Crea un nuevo usuario en la base de datos.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en `req.body`:
+      *   - `nombre` (string): Nombre del usuario.
+      *   - `apellidoPaterno` (string): Apellido paterno del usuario.
+      *   - `apellidoMaterno` (string): Apellido materno del usuario.
+      *   - `userName` (string): Nombre de usuario.
+      *   - `contraseña` (string): Contraseña del usuario.
+      *   - `rol` (string): Rol del usuario.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns El registro creado o un mensaje de error.
+    */
+
     try {
       const {
         nombre,
@@ -90,6 +108,14 @@ class UsuarioController extends AbstractController {
   }
 
   private async getTodos(req: Request, res: Response) {
+    /**
+      * Obtiene todos los usuarios almacenados en la base de datos.
+      *
+      * @param req - Objeto de solicitud HTTP.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Lista de usuarios o un mensaje de error.
+    */
+
     try {
       const usuarios = await db.Usuario.findAll();
       res.status(200).json(usuarios);
@@ -101,6 +127,15 @@ class UsuarioController extends AbstractController {
   }
 
   private async getPorId(req: Request, res: Response) {
+    /**
+      * Obtiene un usuario por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en `req.params`:
+      *   - `id` (number): ID del usuario a buscar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns El usuario encontrado o un mensaje de error si no se encuentra.
+    */
+
     try {
       const { id } = req.params;
       const usuario = await db.Usuario.findByPk(id);
@@ -115,6 +150,23 @@ class UsuarioController extends AbstractController {
   }
 
   private async putActualizar(req: Request, res: Response) {
+    /**
+      * Actualiza un usuario existente por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - En `req.params`:
+      *     - `id` (number): ID del usuario a actualizar.
+      *   - En `req.body`:
+      *     - `nombre` (string): Nuevo nombre del usuario.
+      *     - `apellidoPaterno` (string): Nuevo apellido paterno del usuario.
+      *     - `apellidoMaterno` (string): Nuevo apellido materno del usuario.
+      *     - `userName` (string): Nuevo nombre de usuario.
+      *     - `contraseña` (string): Nueva contraseña del usuario.
+      *     - `rol` (string): Nuevo rol del usuario.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns El usuario actualizado o un mensaje de error si no se encuentra.
+    */
+
     try {
       const { id } = req.params;
       const {
@@ -144,6 +196,15 @@ class UsuarioController extends AbstractController {
   }
 
   private async deletePorId(req: Request, res: Response) {
+    /**
+      * Elimina un usuario por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en `req.params`:
+      *   - `id` (number): ID del usuario a eliminar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Un mensaje de confirmación si se elimina correctamente o un mensaje de error si no se encuentra.
+    */
+
     try {
       const { id } = req.params;
       const usuario = await db.Usuario.findByPk(id);
@@ -159,6 +220,16 @@ class UsuarioController extends AbstractController {
   }
 
   private async postLogin(req: Request, res: Response) {
+    /**
+      * Inicia sesión de un usuario utilizando `userName` y `contraseña`.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en `req.body`:
+      *   - `userName` (string): Nombre de usuario.
+      *   - `contraseña` (string): Contraseña del usuario.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Un token JWT si las credenciales son correctas o un mensaje de error.
+    */
+
     try {
       const { userName, contraseña } = req.body;
       const usuario = await db.Usuario.findOne({ where: { userName } });
@@ -190,6 +261,15 @@ class UsuarioController extends AbstractController {
   }
 
   private async postValidaToken(req: Request, res: Response) {
+    /**
+      * Valida un token JWT enviado en el cuerpo de la solicitud.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en `req.body`:
+      *   - `token` (string): Token JWT a validar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Respuesta indicando si el token es válido o no.
+    */
+
     try {
       const { token } = req.body;
 
@@ -219,6 +299,16 @@ class UsuarioController extends AbstractController {
   }
 
   private async postTokenSinExpiracion(req: Request, res: Response) {
+    /**
+      * Genera un token JWT sin expiración para el usuario.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en `req.body`:
+      *   - `userName` (string): Nombre de usuario.
+      *   - `contraseña` (string): Contraseña del usuario.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Un token JWT sin expiración si las credenciales son correctas o un mensaje de error.
+    */
+
     try {
       const { userName, contraseña } = req.body;
       const usuario = await db.Usuario.findOne({ where: { userName } });
@@ -253,6 +343,16 @@ class UsuarioController extends AbstractController {
   }
 
   private async postLoginCaseta(req: Request, res: Response) {
+    /**
+      * Inicia sesión de un usuario con rol "Caseta".
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en `req.body`:
+      *   - `userName` (string): Nombre de usuario.
+      *   - `contraseña` (string): Contraseña del usuario.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Un token JWT si las credenciales son correctas y el rol es "Caseta", o un mensaje de error.
+    */
+
     try {
       const { userName, contraseña } = req.body;
       const usuario = await db.Usuario.findOne({ where: { userName } });
@@ -296,6 +396,13 @@ class UsuarioController extends AbstractController {
   }
 
   public async getPublicPorId(id: number): Promise<number | null> {
+    /**
+      * Obtiene el ID de un usuario por su ID público.
+      *
+      * @param id - ID del usuario a buscar.
+      * @returns El ID del usuario si se encuentra, o null si no se encuentra o ocurre un error.
+    */
+
     try {
       const usuario = await db.Usuario.findByPk(id);
       return usuario ? usuario.dataValues.idUsuario : null; // Devuelve solo el id si se encuentra, o null si no

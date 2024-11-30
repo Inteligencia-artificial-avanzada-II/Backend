@@ -32,6 +32,7 @@ class OrdenController extends AbstractController {
   private namespace = BUCKET_NAMESPACE;
   private bucketName = BUCKET_NAME;
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
     this.router.post(
@@ -118,6 +119,13 @@ class OrdenController extends AbstractController {
   }
 
   private async getTest(req: Request, res: Response) {
+    /**
+      * Prueba de conexión con el controlador.
+      * 
+      * @param - None
+      * @returns - None
+    */
+
     try {
       res.status(200).json({
         message: "Orden Works",
@@ -132,6 +140,26 @@ class OrdenController extends AbstractController {
   }
 
   private async postCrear(req: Request, res: Response) {
+    /**
+      * Crea una nueva orden en la base de datos (SQL y MongoDB).
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `sqlData` (object): Datos para la orden en SQL, que incluye:
+      *     - `idContenedor` (string): ID del contenedor asociado.
+      *     - `idCamion` (string): ID del camión asociado.
+      *     - `origen` (string): Origen de la orden.
+      *     - `idCedis` (string): ID del CEDIS asociado.
+      *     - `localization` (string): Localización de la orden.
+      *   - `mongoData` (object): Datos para la orden en MongoDB, que incluye:
+      *     - `orderNumber` (string): Número de la orden.
+      *     - `createdBy` (string): Usuario creador de la orden.
+      *     - `modifiedBy` (string): Usuario modificador de la orden.
+      *     - `creationDate` (Date): Fecha de creación de la orden.
+      *     - `products` (array): Lista de productos.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Orden creada o mensaje de error.
+    */
+
     try {
       const { sqlData, mongoData } = req.body;
       const idContenedor = req.body.sqlData.idContenedor;
@@ -260,6 +288,13 @@ class OrdenController extends AbstractController {
   }
 
   private async getTodos(req: Request, res: Response) {
+    /**
+      * Obtiene todas las órdenes almacenadas en la base de datos.
+      * 
+      * @param - None
+      * @returns Lista de órdenes o mensaje de error.
+    */
+
     try {
       const ordenes = await db.Orden.findAll();
       res.status(200).json({
@@ -275,6 +310,15 @@ class OrdenController extends AbstractController {
   }
 
   private async getPorId(req: Request, res: Response) {
+    /**
+      * Obtiene una orden por su ID.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID único de la orden a consultar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Orden consultada o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const orden = await db.Orden.findByPk(id);
@@ -297,6 +341,15 @@ class OrdenController extends AbstractController {
   }
 
   private async getPorIdCodigoQr(req: Request, res: Response) {
+    /**
+      * Obtiene los datos de una orden por su ID y su código QR.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID único de la orden a consultar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Datos de la orden (SQL y MongoDB) o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const orden = await db.Orden.findByPk(id);
@@ -327,6 +380,20 @@ class OrdenController extends AbstractController {
   }
 
   private async putActualizar(req: Request, res: Response) {
+    /**
+      * Actualiza los datos de una orden por su ID.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID único de la orden a actualizar.
+      *   - `idContenedor` (string en `req.body`): Nuevo ID del contenedor.
+      *   - `idCamion` (string en `req.body`): Nuevo ID del camión.
+      *   - `origen` (string en `req.body`): Nuevo origen de la orden.
+      *   - `idCedis` (string en `req.body`): Nuevo ID del CEDIS.
+      *   - `idMongoProductos` (string en `req.body`): Nuevo ID de MongoDB para productos.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Orden actualizada o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const { idContenedor, idCamion, origen, idCedis, idMongoProductos } =
@@ -357,6 +424,15 @@ class OrdenController extends AbstractController {
   }
 
   private async getLocalizacion(req: Request, res: Response) {
+    /**
+      * Obtiene todas las órdenes activas por localización.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `localizacion` (string en `req.params`): Localización a filtrar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Lista de órdenes o mensaje de error.
+    */
+
     try {
       const { localizacion } = req.params;
       const ordenes = await db.Orden.findAll({
@@ -378,6 +454,16 @@ class OrdenController extends AbstractController {
   }
 
   private async putActualizarLocalizacion(req: Request, res: Response) {
+    /**
+      * Actualiza la localización de una orden por su ID.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID único de la orden.
+      *   - `localizacion` (string en `req.body`): Nueva localización de la orden.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Orden actualizada o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const { localizacion } = req.body;
@@ -403,6 +489,15 @@ class OrdenController extends AbstractController {
   }
 
   private async deletePorId(req: Request, res: Response) {
+    /**
+      * Elimina una orden por su ID.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID único de la orden a eliminar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje de éxito si se elimina correctamente o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const orden = await db.Orden.findByPk(id);
@@ -426,6 +521,15 @@ class OrdenController extends AbstractController {
   }
 
   private async getQrUrl(req: Request, res: Response) {
+    /**
+      * Obtiene la URL del QR de una orden activa.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID único del contenedor.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns URL del QR o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
 
@@ -458,6 +562,15 @@ class OrdenController extends AbstractController {
   }
 
   private async postCsvUpload(req: Request, res: Response) {
+    /**
+      * Sube un archivo CSV al almacenamiento en la nube.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - Archivo CSV en el campo `file`.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Información del archivo subido o mensaje de error.
+    */
+
     try {
       const file = req.file;
 
@@ -506,6 +619,16 @@ class OrdenController extends AbstractController {
   }
 
   private async getOrdersByDateRange(req: Request, res: Response) {
+    /**
+      * Obtiene órdenes dentro de un rango de fechas.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `startDate` (string en `req.query`): Fecha de inicio en formato ISO.
+      *   - `endDate` (string en `req.query`): Fecha de fin en formato ISO.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Lista de órdenes dentro del rango de fechas o mensaje de error.
+    */
+
     try {
       const { startDate, endDate } = req.query;
 
@@ -547,6 +670,15 @@ class OrdenController extends AbstractController {
   }
 
   private async getOrdersByIdMongo(req: Request, res: Response) {
+    /**
+      * Obtiene una orden utilizando su ID de MongoDB.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID único de MongoDB asociado a la orden.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Datos de la orden consultada o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const order = await db.Orden.findOne({ where: { idMongoProductos: id } });
@@ -570,6 +702,20 @@ class OrdenController extends AbstractController {
   }
 
   private async getOrdersWithFilters(req: Request, res: Response) {
+    /**
+      * Obtiene órdenes aplicando filtros opcionales (fechas, contenedor, camión, etc.).
+      * 
+      * @param req - Objeto de solicitud HTTP que puede contener:
+      *   - `startDate` (string en `req.query`): Fecha de inicio en formato ISO.
+      *   - `endDate` (string en `req.query`): Fecha de fin en formato ISO.
+      *   - `idContenedor` (string en `req.query`): ID del contenedor a filtrar.
+      *   - `idCamion` (string en `req.query`): ID del camión a filtrar.
+      *   - `origen` (string en `req.query`): Origen de la orden.
+      *   - `idCedis` (string en `req.query`): ID del CEDIS.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Lista combinada de órdenes SQL y MongoDB o mensaje de error.
+    */
+
     try {
       const { startDate, endDate, idContenedor, idCamion, origen, idCedis } =
         req.query;
@@ -635,6 +781,15 @@ class OrdenController extends AbstractController {
   }
 
   private async getOrderCamionInEstatus(req: Request, res: Response) {
+    /**
+      * Obtiene camiones por estatus en las órdenes.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `estatus` (string en `req.params`): Estatus de la localización del camión.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Lista de órdenes relacionadas con el estatus del camión o mensaje de error.
+    */
+
     try {
       // Obtener el estatus de los parámetros de la ruta
       const estatus = req.params.estatus;
@@ -663,6 +818,15 @@ class OrdenController extends AbstractController {
   }
 
   private async putOrdenInactiva(req: Request, res: Response) {
+    /**
+      * Marca una orden como inactiva.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `idOrden` (string en `req.params`): ID único de la orden a inactivar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje de éxito con la orden inactivada o mensaje de error.
+    */
+
     try {
       // Obtener el ID de la orden de los parámetros de la ruta
       const { idOrden } = req.params;
@@ -699,6 +863,13 @@ class OrdenController extends AbstractController {
   }
 
   public async ordenInactiva(idOrden: string) {
+    /**
+      * Marca una orden como inactiva (método reutilizable).
+      * 
+      * @param idOrden - ID único de la orden a inactivar.
+      * @returns Objeto con la orden inactivada o mensaje de error.
+    */
+
     try {
       // Realizar la consulta al modelo Orden
       const orden = await db.Orden.findByPk(idOrden);
@@ -721,6 +892,13 @@ class OrdenController extends AbstractController {
   }
 
   public async getOrdenById(idOrden: string) {
+    /**
+      * Obtiene una orden por su ID (método reutilizable).
+      * 
+      * @param idOrden - ID único de la orden a consultar.
+      * @returns Objeto con los datos de la orden o mensaje de error.
+    */
+
     try {
       const orden = await db.Orden.findByPk(idOrden);
       if (!orden) {
@@ -737,6 +915,15 @@ class OrdenController extends AbstractController {
   }
 
   private async actualizarEstadoCamion(req: Request, res: Response) {
+    /**
+      * Actualiza el estado de ocupación de un camión asociado a una orden.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `idOrden` (string en `req.params`): ID único de la orden asociada al camión.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Datos de la orden y el camión actualizado o mensaje de error.
+    */
+
     try {
       const { idOrden } = req.params;
 
@@ -777,6 +964,13 @@ class OrdenController extends AbstractController {
   }
 
   public async actualizarEstadoCamionFinal(idOrden: string) {
+    /**
+      * Actualiza el estado de ocupación de un camión (método reutilizable).
+      * 
+      * @param idOrden - ID único de la orden asociada al camión.
+      * @returns Mensaje de éxito con los datos de la orden y camión actualizados o mensaje de error.
+    */
+
     try {
       // Busca la orden por idOrden
       const orden = await db.Orden.findByPk(idOrden);
@@ -817,6 +1011,14 @@ class OrdenController extends AbstractController {
   }
 
   private async getOrdenesFront(req: Request, res: Response) {
+    /**
+      * Obtiene órdenes activas con datos adicionales para el frontend.
+      * 
+      * @param req - None.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Lista de órdenes activas con datos de contenedores y productos o mensaje de error.
+    */
+
     try {
       // Obtén todas las órdenes activas
       const ordenes = await db.Orden.findAll({

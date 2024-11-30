@@ -15,6 +15,7 @@ class ContenedorController extends AbstractController {
     return this._instance;
   }
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
     this.router.post(
@@ -72,11 +73,13 @@ class ContenedorController extends AbstractController {
   }
 
   private async getTest(req: Request, res: Response) {
-    /**
-     * Prueba de conexión con el controlador
-     * @param - None
-     * @returns - None
-     */
+  /**
+    * Prueba de conexión con el controlador.
+    * 
+    * @param - None
+    * @returns - None
+  */
+
     try {
       res.status(200).send("Contenedor works");
     } catch (error) {
@@ -85,6 +88,20 @@ class ContenedorController extends AbstractController {
   }
 
   private async postCrear(req: Request, res: Response) {
+    /**
+      * Crea un nuevo contenedor en la base de datos.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `userName` (string en `req.body`): Nombre de usuario asociado al contenedor.
+      *   - `capacidad` (number en `req.body`): Capacidad del contenedor.
+      *   - `contraseña` (string en `req.body`): Contraseña del contenedor.
+      *   - `tipo` (string en `req.body`): Tipo de contenedor.
+      *   - `status` (string en `req.body`): Estado del contenedor.
+      *   - `rental` (boolean en `req.body`): Indica si es de alquiler.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Contenedor creado o mensaje de error.
+    */
+
     try {
       const { userName, capacidad, contraseña, tipo, status, rental } =
         req.body;
@@ -104,6 +121,13 @@ class ContenedorController extends AbstractController {
   }
 
   private async getTodos(req: Request, res: Response) {
+    /**
+      * Obtiene todos los contenedores almacenados en la base de datos.
+      * 
+      * @param - None
+      * @returns Lista de contenedores o mensaje de error.
+    */
+
     try {
       const contenedores = await db.Contenedor.findAll();
       res.status(200).json(contenedores);
@@ -115,6 +139,13 @@ class ContenedorController extends AbstractController {
   }
 
   private async getDisponibles(req: Request, res: Response) {
+    /**
+      * Obtiene todos los contenedores disponibles.
+      * 
+      * @param - None
+      * @returns Lista de contenedores disponibles o mensaje de error.
+    */
+
     try {
       const contenedores = await db.Contenedor.findAll({
         where: { status: "Disponible" },
@@ -128,6 +159,15 @@ class ContenedorController extends AbstractController {
   }
 
   private async getPorId(req: Request, res: Response) {
+    /**
+      * Obtiene un contenedor por su ID.
+      *   
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID único del contenedor a consultar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Contenedor encontrado o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const contenedor = await db.Contenedor.findByPk(id);
@@ -142,6 +182,16 @@ class ContenedorController extends AbstractController {
   }
 
   private async putActualizar(req: Request, res: Response) {
+    /**
+      * Actualiza los datos de un contenedor por su ID.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID único del contenedor a actualizar.
+      *   - `capacidad` (number en `req.body`): Nueva capacidad del contenedor.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Contenedor actualizado o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const { capacidad } = req.body;
@@ -159,6 +209,16 @@ class ContenedorController extends AbstractController {
   }
 
   private async putActualizarStatus(req: Request, res: Response) {
+    /**
+      * Actualiza el estado de un contenedor por su ID.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `idContenedor` (string en `req.params`): ID único del contenedor a actualizar.
+      *   - `status` (string en `req.body`): Nuevo estado del contenedor.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Contenedor actualizado o mensaje de error.
+    */
+
     try {
       const { idContenedor } = req.params;
       const { status } = req.body;
@@ -176,6 +236,14 @@ class ContenedorController extends AbstractController {
   }
 
   public async ActualizarStatus(id: number, status: string) {
+    /**
+      * Actualiza el estado de un contenedor por su ID.
+      * 
+      * @param id - ID único del contenedor a actualizar.
+      * @param status - Nuevo estado del contenedor.
+      * @returns `true` si el estado fue actualizado exitosamente, `false` si no se encontró el contenedor o ocurrió un error.
+    */
+
     try {
       const contenedor = await db.Contenedor.findByPk(id);
       if (!contenedor) {
@@ -190,6 +258,15 @@ class ContenedorController extends AbstractController {
   }
 
   private async deletePorId(req: Request, res: Response) {
+    /**
+      * Elimina un contenedor por su ID.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID único del contenedor a eliminar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje de éxito o error.
+    */
+
     try {
       const { id } = req.params;
       const contenedor = await db.Contenedor.findByPk(id);
@@ -205,6 +282,16 @@ class ContenedorController extends AbstractController {
   }
 
   private async postLogin(req: Request, res: Response) {
+    /**
+      * Realiza el login para un contenedor.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `userName` (string en `req.body`): Nombre de usuario asociado al contenedor.
+      *   - `contraseña` (string en `req.body`): Contraseña del contenedor.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Token de autenticación o mensaje de error.
+    */
+
     try {
       const { userName, contraseña } = req.body;
       const contenedor = await db.Contenedor.findOne({ where: { userName } });
@@ -239,6 +326,15 @@ class ContenedorController extends AbstractController {
   }
 
   private async postValidaToken(req: Request, res: Response) {
+    /**
+      * Valida un token proporcionado.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `token` (string en `req.body`): Token a validar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Validación del token o mensaje de error.
+    */
+
     try {
       const { token } = req.body;
 
@@ -267,6 +363,16 @@ class ContenedorController extends AbstractController {
   }
 
   private async postTokenSinExpiracion(req: Request, res: Response) {
+    /**
+      * Genera un token sin expiración para un contenedor.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `userName` (string en `req.body`): Nombre de usuario asociado al contenedor.
+      *   - `contraseña` (string en `req.body`): Contraseña del contenedor.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Token sin expiración o mensaje de error.
+    */
+
     try {
       const { userName, contraseña } = req.body;
       const contenedor = await db.Contenedor.findOne({ where: { userName } });
@@ -294,6 +400,13 @@ class ContenedorController extends AbstractController {
   }
 
   private async getEnTransitoDescargandoFosa(req: Request, res: Response) {
+    /**
+      * Obtiene los contenedores en tránsito, descargando, y los asignados a la fosa.
+      * 
+      * @param - None
+      * @returns Lista de contenedores en tránsito, descargando, y en la fosa o mensaje de error.
+    */
+
     try {
       const transito = await db.Contenedor.findAll({
         where: {
@@ -319,6 +432,15 @@ class ContenedorController extends AbstractController {
   }
 
   private async postObtenerContenedoresInfoList(req: Request, res: Response) {
+    /**
+      * Obtiene información de una lista específica de contenedores.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `contenedoresList` (array en `req.body`): Lista de IDs de contenedores a consultar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Lista de contenedores encontrados o mensaje de error.
+    */
+
     try {
 
       const { contenedoresList } = req.body;

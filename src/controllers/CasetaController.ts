@@ -25,6 +25,7 @@ class CasetaController extends AbstractController {
     return this._instance;
   }
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
     this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
@@ -144,7 +145,7 @@ class CasetaController extends AbstractController {
      * 
      * @param req - Contiene el ID de la caseta en los parámetros de la URL.
      * @returns {void} - No devuelve contenido si la eliminación es exitosa o un mensaje de error si no se encuentra.
-     */
+    */
 
     try {
       const { id } = req.params;

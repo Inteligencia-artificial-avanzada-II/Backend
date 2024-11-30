@@ -15,6 +15,7 @@ class FosaController extends AbstractController {
     return this._instance;
   }
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", this.getTest.bind(this));
     this.router.post("/crear", this.postCrear.bind(this));
@@ -30,6 +31,21 @@ class FosaController extends AbstractController {
   }
 
   private async agregarContenedor(req: Request, res: Response) {
+    /**
+      * Agrega un contenedor a la estructura de datos de la fosa en la base de datos.
+      * 
+      * - Verifica que los parámetros `dateTime` e `idContenedor` estén presentes y sean válidos.
+      * - Formatea la fecha y la hora para crear una clave única del contenedor.
+      * - Actualiza dinámicamente la estructura de datos de la fosa con la nueva entrada.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `dateTime` (string): Fecha y hora en formato ISO (ejemplo: "2024-11-29T15:45:00").
+      *   - `idContenedor` (string): ID único del contenedor.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Documento actualizado de la base de datos o un error.
+    */
+
+
     try {
       const { dateTime, idContenedor } = req.body;
 
@@ -84,10 +100,11 @@ class FosaController extends AbstractController {
 
   private async getTest(req: Request, res: Response) {
     /**
-     * Prueba de conexión con el controlador
-     * @param - None
-     * @returns - None
-     */
+      * Prueba de conexión con el controlador
+      * @param - None
+      * @returns - None
+    */
+
     try {
       res.status(200).send("Fosa works");
     } catch (error) {
@@ -96,6 +113,19 @@ class FosaController extends AbstractController {
   }
 
   private async postCrear(req: Request, res: Response) {
+    /**
+      * Crea un nuevo documento de fosa en la base de datos.
+      * 
+      * - Recibe un objeto `fosa` desde el cuerpo de la petición.
+      * - Valida que el objeto sea válido antes de crear el documento.
+      * - Devuelve el documento creado o un error en caso de fallo.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `fosa` (object): Objeto con la estructura de datos inicial de la fosa.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Documento creado o mensaje de error.
+    */
+
     try {
       const { fosa } = req.body; // Recibimos un objeto `fosa` desde el request
 
@@ -116,6 +146,12 @@ class FosaController extends AbstractController {
   }
 
   private async getTodos(req: Request, res: Response) {
+    /**
+      * Consulta y devuelve todos los documentos de fosas almacenados en la base de datos.
+      * 
+      * @param - None
+      * @returns - Lista de documentos de fosas o mensaje de error.
+    */
     try {
       const orders = await this.model.find();
       res.status(200).json(orders);
@@ -131,6 +167,18 @@ class FosaController extends AbstractController {
     dateTime: string,
     idContenedor: string
   ): Promise<any> {
+    /**
+      * Agrega un contenedor directamente a la estructura de datos de la fosa.
+      * 
+      * - Recibe `dateTime` e `idContenedor` como parámetros.
+      * - Valida y formatea los datos antes de actualizar la base de datos.
+      * - Actualiza dinámicamente el documento en la base de datos con la nueva entrada.
+      * 
+      * @param dateTime - Fecha y hora en formato ISO (ejemplo: "2024-11-29T15:45:00").
+      * @param idContenedor - ID único del contenedor.
+      * @returns Documento actualizado o lanza un error en caso de fallo.
+    */
+
     try {
       // Validar que se reciban los parámetros necesarios
       if (!dateTime || !idContenedor) {
@@ -194,6 +242,19 @@ class FosaController extends AbstractController {
   }
 
   private async actualizarEstadoContenedor(req: Request, res: Response) {
+    /**
+      * Actualiza el estado de un contenedor en la base de datos.
+      * 
+      * - Cambia el estado de un contenedor de `true` a `false` en la estructura de datos.
+      * - Utiliza la fecha actual para localizar la entrada correspondiente.
+      * - Devuelve un mensaje de éxito o error según corresponda.
+      * 
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `idContenedor` (string): ID único del contenedor cuyo estado será actualizado.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje de éxito o error.
+    */
+
     try {
       const { idContenedor } = req.body;
 
@@ -268,6 +329,16 @@ class FosaController extends AbstractController {
   }
 
   public async actualizarEstadoContenedorPublic(idContenedor: string) {
+    /**
+      * Actualiza el estado de un contenedor de manera pública.
+      * 
+      * - Cambia el estado de un contenedor de `true` a `false`.
+      * - Se usa principalmente para casos donde no se trabaja con una solicitud HTTP directa.
+      * 
+      * @param idContenedor - ID único del contenedor.
+      * @returns Documento actualizado o un objeto vacío en caso de error.
+    */
+
     try {
 
       if (!idContenedor) {

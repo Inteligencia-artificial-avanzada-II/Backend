@@ -14,6 +14,7 @@ class PuertaContenedorController extends AbstractController {
     return this._instance;
   }
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
     this.router.post(
@@ -49,6 +50,14 @@ class PuertaContenedorController extends AbstractController {
   }
 
   private async getTest(req: Request, res: Response) {
+    /**
+      * Prueba de conexión con el controlador.
+      *
+      * @param req - Objeto de solicitud HTTP.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje indicando que la conexión funciona o mensaje de error.
+    */
+
     try {
       res.status(200).send("PuertaContenedor Works");
     } catch (error) {
@@ -59,6 +68,15 @@ class PuertaContenedorController extends AbstractController {
   }
 
   private async postCrear(req: Request, res: Response) {
+    /**
+      * Crea un nuevo registro de PuertaContenedor en la base de datos.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en el cuerpo:
+      *   - Los datos necesarios para crear un PuertaContenedor.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Registro creado o mensaje de error.
+    */
+
     try {
       const puertacontenedor = await db.PuertaContenedor.create(req.body);
       res.status(201).send(puertacontenedor);
@@ -73,6 +91,16 @@ class PuertaContenedorController extends AbstractController {
     idPuerta: number;
     fecha: Date;
   }) {
+    /**
+      * Crea un nuevo registro de PuertaContenedor (método reutilizable).
+      *
+      * @param data - Objeto con los datos requeridos:
+      *   - `idContenedor` (number): ID del contenedor.
+      *   - `idPuerta` (number): ID de la puerta.
+      *   - `fecha` (Date): Fecha del registro.
+      * @returns Objeto creado o mensaje de error.
+    */
+
     try {
       const puertacontenedor = await db.PuertaContenedor.create(data);
       return puertacontenedor; // Retorna el objeto sin enviar la respuesta
@@ -82,6 +110,14 @@ class PuertaContenedorController extends AbstractController {
   }
 
   private async getTodos(req: Request, res: Response) {
+    /**
+      * Obtiene todos los registros de PuertaContenedor de la base de datos.
+      *
+      * @param req - Objeto de solicitud HTTP.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Lista de todos los registros o mensaje de error.
+    */
+
     try {
       const puertacontenedor = await db.PuertaContenedor.findAll();
       res.status(200).send(puertacontenedor);
@@ -91,6 +127,15 @@ class PuertaContenedorController extends AbstractController {
   }
 
   private async getPorId(req: Request, res: Response) {
+    /**
+      * Obtiene un registro de PuertaContenedor por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID del registro a consultar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Registro encontrado o mensaje de error.
+    */
+
     try {
       const puertacontenedor = await db.PuertaContenedor.findByPk(
         req.params.id
@@ -102,6 +147,16 @@ class PuertaContenedorController extends AbstractController {
   }
 
   private async putActualizar(req: Request, res: Response) {
+    /**
+      * Actualiza un registro de PuertaContenedor por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID del registro a actualizar.
+      *   - Datos actualizados en el cuerpo de la solicitud (`req.body`).
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje de éxito o mensaje de error.
+    */
+
     try {
       await db.PuertaContenedor.update(req.body, {
         where: { idPuertaContenedor: req.params.id },
@@ -116,6 +171,14 @@ class PuertaContenedorController extends AbstractController {
     idPuerta: string,
     idContenedor: string
   ) {
+    /**
+      * Actualiza el estado de un registro activo de PuertaContenedor a inactivo.
+      *
+      * @param idPuerta - ID de la puerta asociada.
+      * @param idContenedor - ID del contenedor asociado.
+      * @returns Mensaje de éxito si la actualización es correcta o mensaje de error.
+    */
+
     try {
       // Buscar el registro con isActive: true, idPuerta y idContenedor específicos
       const registro = await db.PuertaContenedor.findOne({
@@ -143,6 +206,15 @@ class PuertaContenedorController extends AbstractController {
   }
 
   private async deletePorId(req: Request, res: Response) {
+    /**
+      * Elimina un registro de PuertaContenedor por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID del registro a eliminar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje de éxito o mensaje de error.
+    */
+
     try {
       await db.PuertaContenedor.destroy({ where: { id: req.params.id } });
       res.status(200).send("PuertaContenedor eliminada");
@@ -152,6 +224,15 @@ class PuertaContenedorController extends AbstractController {
   }
 
   private async consultarPuerta(req: Request, res: Response): Promise<void> {
+    /**
+      * Consulta la puerta asociada a un contenedor activo.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `idContenedor` (string en `req.params`): ID del contenedor.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Registro de PuertaContenedor activo o mensaje de error.
+    */
+
     try {
       const { idContenedor } = req.params;
 

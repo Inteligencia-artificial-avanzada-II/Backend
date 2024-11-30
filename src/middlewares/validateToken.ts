@@ -7,14 +7,17 @@ export const validateTokenMiddleware = (req: Request, res: Response, next: NextF
     const authorizationHeader = req.headers['authorization'];
     const token = Array.isArray(authorizationHeader) ? authorizationHeader[0]?.split('Token ')[1] : authorizationHeader?.split('Token ')[1];
 
+    // Validamoz que exista el token
     if (!token) {
-        return res.status(401).json({ message: 'No token provided', data: {} });
+        return res.status(401).json({ message: 'No token provided', data: {} }); // Si no existe devolvemos una respuesta de error
     }
 
+    // Validamos el token
     const decodedToken: JwtPayload | null = validateJWT(token);
 
+    // Validamos la validación del token
     if (!decodedToken) {
-        return res.status(401).json({ message: 'Invalid token', data: {} });
+        return res.status(401).json({ message: 'Invalid token', data: {} }); // Si no es válido el token, devolvemos una respuesta de error
     }
 
     // Si el token es válido, adjuntamos el token decodificado al objeto de la solicitud

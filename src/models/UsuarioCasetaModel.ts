@@ -7,6 +7,7 @@ interface UsuarioCasetaAttributes {
   idCaseta: number;
 }
 
+// Exporta una función que define el modelo UsuarioCaseta
 module.exports = (sequelize: Sequelize, DataTypes: any) => {
   class UsuarioCaseta
     extends Model<UsuarioCasetaAttributes>

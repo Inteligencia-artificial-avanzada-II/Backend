@@ -24,6 +24,7 @@ class CamionController extends AbstractController {
     return this._instance;
   }
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", this.getTest.bind(this));
     this.router.post("/crear", this.postCrear.bind(this));
@@ -37,10 +38,12 @@ class CamionController extends AbstractController {
 
   private async getTest(req: Request, res: Response) {
     /**
-     * Prueba de conexión con el controlador
-     * @param - None
-     * @returns - None
-     */
+      * Prueba de conexión con el controlador.
+      * 
+      * @param - None
+      * @returns - None
+    */
+
     try {
       res.status(200).send("Camion works");
     } catch (error) {
@@ -80,7 +83,7 @@ class CamionController extends AbstractController {
      *
      * @param req - None.
      * @returns {dict} - Diccionario con todos los camiones.
-     */
+    */
 
     try {
       const camiones = await db.Camion.findAll();
@@ -98,7 +101,7 @@ class CamionController extends AbstractController {
      *
      * @param req - Contiene el ID del camión en los parámetros de la URL.
      * @returns {dict} - Diccionario con los detalles del camión, o un mensaje de error si no se encuentra.
-     */
+    */
 
     try {
       const { id } = req.params;
@@ -119,7 +122,7 @@ class CamionController extends AbstractController {
      *
      * @param req - None.
      * @returns {dict} - Diccionario con todos los camiones disponibles.
-     */
+    */
 
     try {
       const camiones = await db.Camion.findAll({
@@ -145,7 +148,7 @@ class CamionController extends AbstractController {
      * @param {string} idCamion - El ID del camión a actualizar.
      * @param {boolean} isOccupied - El estado de ocupación del camión.
      * @returns {Promise<void>} No devuelve ningún valor directamente. Envía una respuesta HTTP al cliente.
-     */
+    */
 
     try {
       const camion = await db.Camion.findByPk(idCamion);
@@ -165,7 +168,7 @@ class CamionController extends AbstractController {
      *
      * @param req - None.
      * @returns {dict} - Diccionario con todos los camiones no disponibles.
-     */
+    */
 
     try {
       const camiones = await db.Camion.findAll({
@@ -187,7 +190,7 @@ class CamionController extends AbstractController {
      *
      * @param req - Contiene el ID del camión en los parámetros de la URL y los datos actualizados en el cuerpo de la petición.
      * @returns {dict} - Diccionario con los detalles del camión actualizado o un mensaje de error si no se encuentra.
-     */
+    */
 
     try {
       const { id } = req.params;
@@ -214,7 +217,7 @@ class CamionController extends AbstractController {
      *
      * @param req - Contiene el ID del camión en los parámetros de la URL.
      * @returns {void} - No devuelve contenido si la eliminación es exitosa o un mensaje de error si no se encuentra.
-     */
+    */
 
     try {
       const { id } = req.params;

@@ -15,6 +15,7 @@ class UsuarioCasetaController extends AbstractController {
     return this._instance;
   }
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
     this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
@@ -26,6 +27,16 @@ class UsuarioCasetaController extends AbstractController {
   }
 
   private async testPythonBack(req: Request, res: Response) {
+    /**
+      * Prueba de conexión con el backend de Python.
+      *
+      * @param req - Objeto de solicitud HTTP.
+      *   - Headers:
+      *     - `Authorization`: Token necesario para la autenticación con el backend de Python.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Respuesta del backend de Python o un mensaje de error si no se puede conectar.
+    */
+
     try {
       console.log("RequestPython recibido")
       const token = req.headers.authorization || "{{Token}}";
@@ -49,10 +60,13 @@ class UsuarioCasetaController extends AbstractController {
 
   private async getTest(req: Request, res: Response) {
     /**
-     * Prueba de conexión con el controlador
-     * @param - None
-     * @returns - None
-     */
+      * Prueba de conexión con el controlador.
+      *
+      * @param req - Objeto de solicitud HTTP.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje indicando que la conexión funciona o un mensaje de error.
+    */
+
     try {
       res.status(200).send("UsuarioCaseta Works");
     } catch (error) {
@@ -61,6 +75,16 @@ class UsuarioCasetaController extends AbstractController {
   }
 
   private async postCrear(req: Request, res: Response) {
+    /**
+      * Crea un nuevo registro de UsuarioCaseta en la base de datos.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en `req.body`:
+      *   - `idUsuario` (number): ID del usuario relacionado.
+      *   - `idCaseta` (number): ID de la caseta relacionada.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns El registro creado o un mensaje de error.
+    */
+
     try {
       const { idUsuario, idCaseta } = req.body;
       const usuarioCaseta = await db.UsuarioCaseta.create({
@@ -75,6 +99,14 @@ class UsuarioCasetaController extends AbstractController {
   }
 
   private async getTodos(req: Request, res: Response) {
+    /**
+      * Obtiene todos los registros de UsuarioCaseta almacenados en la base de datos.
+      *
+      * @param req - Objeto de solicitud HTTP.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Lista de registros de UsuarioCaseta o un mensaje de error.
+    */
+
     try {
       const usuariosCaseta = await db.UsuarioCaseta.findAll();
       res.status(200).json(usuariosCaseta);
@@ -86,6 +118,15 @@ class UsuarioCasetaController extends AbstractController {
   }
 
   private async getPorId(req: Request, res: Response) {
+    /**
+      * Obtiene un registro de UsuarioCaseta por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en `req.params`:
+      *   - `id` (number): ID del registro de UsuarioCaseta a buscar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns El registro encontrado o un mensaje de error si no se encuentra.
+    */
+
     try {
       const { id } = req.params;
       const usuarioCaseta = await db.UsuarioCaseta.findByPk(id);
@@ -100,6 +141,19 @@ class UsuarioCasetaController extends AbstractController {
   }
 
   private async putActualizar(req: Request, res: Response) {
+    /**
+      * Actualiza un registro de UsuarioCaseta existente por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - En `req.params`:
+      *     - `id` (number): ID del registro de UsuarioCaseta a actualizar.
+      *   - En `req.body`:
+      *     - `idUsuario` (number): Nuevo ID del usuario relacionado.
+      *     - `idCaseta` (number): Nuevo ID de la caseta relacionada.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns El registro actualizado o un mensaje de error si no se encuentra.
+    */
+
     try {
       const { id } = req.params;
       const { idUsuario, idCaseta } = req.body;
@@ -118,6 +172,15 @@ class UsuarioCasetaController extends AbstractController {
   }
 
   private async deletePorId(req: Request, res: Response) {
+    /**
+      * Elimina un registro de UsuarioCaseta por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en `req.params`:
+      *   - `id` (number): ID del registro de UsuarioCaseta a eliminar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Un mensaje de confirmación si se elimina correctamente o un mensaje de error si no se encuentra.
+    */
+
     try {
       const { id } = req.params;
       const usuarioCaseta = await db.UsuarioCaseta.findByPk(id);

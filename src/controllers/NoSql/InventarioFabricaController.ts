@@ -14,6 +14,7 @@ class InventarioFabricaController extends AbstractController {
         return this._instance;
     }
 
+    // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
     protected initializeRoutes(): void {
         this.router.get("/test", this.getTest.bind(this));
         this.router.post("/crear", this.postCrear.bind(this));
@@ -25,10 +26,12 @@ class InventarioFabricaController extends AbstractController {
 
     private async getTest(req: Request, res: Response) {
         /**
-         * Prueba de conexión con el controlador
-         * @param - None
-         * @returns - None
-         */
+            * Prueba de conexión con el controlador.
+            * 
+            * @param - None
+            * @returns - None
+        */
+
         try {
             res.status(200).send("Inventario works");
         } catch (error) {
@@ -37,6 +40,16 @@ class InventarioFabricaController extends AbstractController {
     }
 
     private async postCrear(req: Request, res: Response) {
+        /**
+            * Crea nuevos productos en el inventario.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `productos` (array): Un arreglo de objetos que representan los productos a crear.
+            *     Ejemplo: [{ nombre: "Producto A", precio: 100 }, { nombre: "Producto B", precio: 200 }]
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Documento creado o mensaje de error.
+        */
+
         try {
             const { productos } = req.body; // Recibimos un array de productos desde el request
 
@@ -57,6 +70,13 @@ class InventarioFabricaController extends AbstractController {
     }
 
     private async getTodos(req: Request, res: Response) {
+        /**
+            * Consulta y devuelve todos los productos del inventario.
+            * 
+            * @param - None
+            * @returns - Lista de productos o mensaje de error.
+        */
+
         try {
             const productos = await this.model.find();
             res.status(200).json(productos);
@@ -66,6 +86,16 @@ class InventarioFabricaController extends AbstractController {
     }
 
     private async getPorId(req: Request, res: Response) {
+        /**
+            * Consulta un producto específico por su ID.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `id` (string en `req.params`): ID único del producto a consultar.
+            *     Ejemplo: "/consultar/12345" donde `12345` es el ID.
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Producto consultado o mensaje de error.
+        */
+
         try {
             const { id } = req.params; // Obtenemos el ID del producto desde los parámetros de la URL
             const producto = await this.model.findById(id); // Buscar el producto por ID
@@ -81,6 +111,17 @@ class InventarioFabricaController extends AbstractController {
     }
 
     private async putActualizar(req: Request, res: Response) {
+        /**
+            * Actualiza un producto específico por su ID.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `id` (string en `req.params`): ID único del producto a actualizar.
+            *   - `updateData` (object en `req.body`): Datos que se van a actualizar.
+            *     Ejemplo: { nombre: "Producto Actualizado", precio: 150 }
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Producto actualizado o mensaje de error.
+        */
+
         try {
             const { id } = req.params;
             const updateData = req.body; // Los datos que se van a actualizar
@@ -98,6 +139,15 @@ class InventarioFabricaController extends AbstractController {
     }
 
     private async deletePorId(req: Request, res: Response) {
+        /**
+            * Elimina un producto específico por su ID.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `id` (string en `req.params`): ID único del producto a eliminar.
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Mensaje de éxito si el producto fue eliminado o mensaje de error.
+        */
+
         try {
             const { id } = req.params;
             const productoEliminado = await this.model.findByIdAndDelete(id);

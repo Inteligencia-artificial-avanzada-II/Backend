@@ -10,10 +10,11 @@ const connectToMongoDB = async () => {
         await mongoose.connect(uri);
         console.log("Conectado a MongoDB correctamente.");
 
-        // Opcional: Aquí puedes obtener la base de datos (aunque en Mongoose no es necesario)
+        // Obtiene la instancia de conexión de Mongoose. Esto no siempre es necesario,
+        // pero puede ser útil para manejar eventos relacionados con la conexión.
         const db = mongoose.connection;
 
-        // Puedes exportar la conexión para usarla en otros archivos
+        // Devuelve la instancia de conexión. Esto permite reutilizarla en otros módulos si es necesario.
         return db;
     } catch (error) {
         console.error("Error conectando a MongoDB:", error);

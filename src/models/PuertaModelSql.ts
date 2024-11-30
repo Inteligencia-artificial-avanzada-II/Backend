@@ -9,6 +9,7 @@ interface PuertaAttributes {
   isOccupied: boolean;
 }
 
+// Exporta una función que define el modelo Puerta
 module.exports = (sequelize: Sequelize, DataTypes: any) => {
   class Puerta extends Model<PuertaAttributes> implements PuertaAttributes {
     public idPuerta!: number;

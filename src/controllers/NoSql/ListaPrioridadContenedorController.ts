@@ -21,6 +21,7 @@ class ListaPrioridadContenedorController extends AbstractController {
         this.model = ListaPrioridadContenedorModel;
     }
 
+    // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
     protected initializeRoutes(): void {
         this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
         this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
@@ -32,6 +33,13 @@ class ListaPrioridadContenedorController extends AbstractController {
 
     // Métodos privados
     private async getTest(req: Request, res: Response) {
+        /**
+            * Prueba de conexión con el controlador.
+            * 
+            * @param - None
+            * @returns - None
+        */
+
         try {
             res.status(200).send("Lista Prioridad Contenedor Controller funciona correctamente");
         } catch (error) {
@@ -40,6 +48,18 @@ class ListaPrioridadContenedorController extends AbstractController {
     }
 
     private async postCrear(req: Request, res: Response) {
+        /**
+            * Crea una nueva lista de prioridad de contenedores.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `contenedores` (array en `req.body`): Lista de contenedores a crear. 
+            *     Si está vacío o no es un array, se inicializará como un array vacío.
+            *     Ejemplo: ["Contenedor1", "Contenedor2"]
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Documento creado o mensaje de error.
+        */
+
+
         try {
             const { contenedores } = req.body;
 
@@ -65,6 +85,13 @@ class ListaPrioridadContenedorController extends AbstractController {
     }
 
     private async getTodos(req: Request, res: Response) {
+        /**
+            * Consulta y devuelve todas las listas de prioridad de contenedores.
+            * 
+            * @param - None
+            * @returns - Lista de documentos de listas de prioridad de contenedores o mensaje de error.
+        */
+
         try {
             const listas = await this.model.find();
             res.status(200).json({ message: "Datos obtenidos exitosamente", data: listas });
@@ -74,6 +101,17 @@ class ListaPrioridadContenedorController extends AbstractController {
     }
 
     private async getPorId(req: Request, res: Response) {
+        /**
+            * Consulta una lista de prioridad de contenedores específica por su ID.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `id` (string en `req.params`): ID único de la lista a consultar.
+            *     Ejemplo: "/consultar/12345" donde `12345` es el ID.
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Lista de prioridad de contenedores o mensaje de error.
+        */
+
+
         try {
             const { id } = req.params;
             const lista = await this.model.findById(id);
@@ -88,6 +126,18 @@ class ListaPrioridadContenedorController extends AbstractController {
     }
 
     private async putActualizar(req: Request, res: Response) {
+        /**
+            * Actualiza una lista de prioridad de contenedores específica por su ID.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `id` (string en `req.params`): ID único de la lista a actualizar.
+            *   - `updateData` (object en `req.body`): Datos que se van a actualizar.
+            *     Ejemplo: { contenedores: ["NuevoContenedor1", "NuevoContenedor2"] }
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Lista actualizada o mensaje de error.
+        */
+
+
         try {
             const { id } = req.params;
             const updatedLista = await this.model.findByIdAndUpdate(id, req.body, { new: true });
@@ -102,6 +152,16 @@ class ListaPrioridadContenedorController extends AbstractController {
     }
 
     private async deletePorId(req: Request, res: Response) {
+        /**
+            * Elimina una lista de prioridad de contenedores específica por su ID.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `id` (string en `req.params`): ID único de la lista a eliminar.
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Mensaje de éxito si la lista fue eliminada o mensaje de error.
+        */
+
+
         try {
             const { id } = req.params;
             const deletedLista = await this.model.findByIdAndDelete(id);
@@ -117,12 +177,29 @@ class ListaPrioridadContenedorController extends AbstractController {
 
     // Métodos públicos
     public async createListaPrioridadContenedor(data: ListaPrioridadContenedor): Promise<ListaPrioridadContenedor & { _id: string }> {
+        /**
+            * Crea una nueva lista de prioridad de contenedores y la guarda en la base de datos.
+            * 
+            * @param data - Objeto que representa la lista de contenedores a guardar.
+            *     Ejemplo: { contenedores: ["Contenedor1", "Contenedor2"] }
+            * @returns Lista creada y guardada en la base de datos.
+        */
+
+
         const newLista = new this.model(data);
         const savedLista = await newLista.save();
         return savedLista as ListaPrioridadContenedor & { _id: string };
     }
 
     public async getListaPrioridadContenedorById(id: string): Promise<ListaPrioridadContenedor | null> {
+        /**
+            * Consulta una lista de prioridad de contenedores por su ID.
+            * 
+            * @param id - ID único de la lista a consultar.
+            * @returns Lista de prioridad de contenedores o `null` si no se encuentra.
+        */
+
+
         try {
             const lista = await this.model.findById(id).select('-__v -_id').exec();
             return lista;
@@ -133,6 +210,14 @@ class ListaPrioridadContenedorController extends AbstractController {
     }
 
     public async consultarListaPrioridadContenedor(): Promise<string[]> {
+        /**
+            * Consulta la lista actual de prioridad de contenedores.
+            * 
+            * @returns Un array con los IDs de los contenedores en la lista.
+            *     Si no hay listas, devuelve un array vacío.
+        */
+
+
         try {
             // Obtener solo el primer documento con su campo 'contenedores'
             const lista = await this.model.findOne().select('contenedores').exec();
@@ -146,6 +231,15 @@ class ListaPrioridadContenedorController extends AbstractController {
     }
 
     public async eliminarContenedor(contenedor: string): Promise<string[]> {
+        /**
+            * Elimina un contenedor específico de la lista de prioridad.
+            * 
+            * @param contenedor - ID del contenedor que se desea eliminar.
+            *     Ejemplo: "Contenedor1"
+            * @returns Lista actualizada de contenedores después de la eliminación.
+        */
+
+
         try {
 
             if (contenedor === 'noContainer') {

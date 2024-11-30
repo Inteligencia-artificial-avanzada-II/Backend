@@ -1,3 +1,8 @@
+/**
+  * Importación de las variables de entorno desde el archivo de configuración.
+  * Estas variables incluyen credenciales, configuraciones de base de datos,
+  * y claves secretas necesarias para cada entorno.
+*/
 import {
   DB_NAME,
   DB_PASSWORD,
@@ -18,6 +23,11 @@ import {
 } from "./index";
 
 export default {
+  /**
+    * Configuración para el entorno de desarrollo.
+    * Contiene las credenciales de acceso y configuraciones específicas
+    * como el nombre de la base de datos, credenciales de MongoDB, y claves secretas.
+  */
   development: {
     username: DB_USER,
     password: DB_PASSWORD,
@@ -32,6 +42,11 @@ export default {
     backPython: BACK_PYTHON,
     tokenNoExp: TOKEN_NO_EXP,
   },
+  /**
+    * Configuración para el entorno de pruebas.
+    * Usada durante los tests, tiene valores por defecto como host local
+    * y base de datos temporal para evitar interferencias con producción.
+  */
   test: {
     username: "root",
     password: null,
@@ -46,6 +61,11 @@ export default {
     backPython: BACK_PYTHON,
     tokenNoExp: TOKEN_NO_EXP,
   },
+  /**
+    * Configuración para el entorno de producción.
+    * Incluye credenciales y configuraciones que deberían estar protegidas y seguras.
+    * Estas configuraciones son usadas en el despliegue final de la aplicación.
+  */
   production: {
     username: "root",
     password: null,
@@ -60,6 +80,11 @@ export default {
     backPython: BACK_PYTHON,
     tokenNoExp: TOKEN_NO_EXP,
   },
+  /**
+    * Configuración específica para Oracle.
+    * Este bloque contiene las credenciales y configuraciones necesarias
+    * para la conexión con servicios de Oracle Cloud Infrastructure.
+  */
   oracle: {
     user: USER,
     fingerprint: FINGERPRINT,

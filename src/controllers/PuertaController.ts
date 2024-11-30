@@ -26,6 +26,7 @@ class PuertaController extends AbstractController {
     return this._instance;
   }
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
     this.router.post(
@@ -66,6 +67,14 @@ class PuertaController extends AbstractController {
   }
 
   private async getTest(req: Request, res: Response) {
+    /**
+      * Prueba de conexión con el controlador.
+      *
+      * @param req - Objeto de solicitud HTTP.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje indicando que la conexión funciona o un mensaje de error.
+    */
+
     try {
       res.status(200).send("Puerta Works");
     } catch (error) {
@@ -74,6 +83,15 @@ class PuertaController extends AbstractController {
   }
 
   private async postCrear(req: Request, res: Response) {
+    /**
+      * Crea una nueva puerta en la base de datos.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener en el cuerpo:
+      *   - Los datos necesarios para crear una puerta.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Puerta creada o mensaje de error.
+    */
+
     try {
       const puerta = await db.Puerta.create(req.body);
       res.status(201).json(puerta);
@@ -83,6 +101,14 @@ class PuertaController extends AbstractController {
   }
 
   private async getTodos(req: Request, res: Response) {
+    /**
+      * Obtiene todas las puertas registradas en la base de datos.
+      *
+      * @param req - Objeto de solicitud HTTP.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Lista de puertas o mensaje de error.
+    */
+
     try {
       const puertas = await db.Puerta.findAll();
       res.status(200).json(puertas);
@@ -92,6 +118,15 @@ class PuertaController extends AbstractController {
   }
 
   private async getPorId(req: Request, res: Response) {
+    /**
+      * Obtiene una puerta específica por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID de la puerta a consultar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Puerta encontrada o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const puerta = await db.Puerta.findByPk(id);
@@ -102,6 +137,16 @@ class PuertaController extends AbstractController {
   }
 
   private async putActualizar(req: Request, res: Response) {
+    /**
+      * Actualiza los datos de una puerta específica por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID de la puerta a actualizar.
+      *   - Datos actualizados en el cuerpo de la solicitud (`req.body`).
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Puerta actualizada o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const puerta = await db.Puerta.findByPk(id);
@@ -117,6 +162,15 @@ class PuertaController extends AbstractController {
   }
 
   private async deletePorId(req: Request, res: Response) {
+    /**
+      * Elimina una puerta específica por su ID.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID de la puerta a eliminar.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje de éxito o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const puerta = await db.Puerta.findByPk(id);
@@ -132,6 +186,18 @@ class PuertaController extends AbstractController {
   }
 
   private async putActualizarOcupado(req: Request, res: Response) {
+    /**
+      * Marca una puerta como disponible y actualiza las entidades relacionadas.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `id` (string en `req.params`): ID de la puerta.
+      *   - `idOrden` (string en `req.body`): ID de la orden asociada.
+      *   - `idContenedor` (string en `req.body`): ID del contenedor asociado.
+      *   - `status` (string en `req.body`): Nuevo estado del contenedor.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Puerta actualizada o mensaje de error.
+    */
+
     try {
       const { id } = req.params;
       const { idOrden } = req.body;
@@ -170,6 +236,16 @@ class PuertaController extends AbstractController {
   }
 
   private async postAcomodar(req: Request, res: Response) {
+    /**
+      * Acomoda un contenedor en una puerta disponible o lo envía a la fosa si no hay puertas disponibles.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `idContenedor` (string en `req.body`): ID del contenedor a acomodar.
+      *   - `dateTime` (string en `req.body`): Fecha y hora en formato ISO 8601.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Puerta asignada o lista de acomodo si se envía a la fosa, o un mensaje de error.
+    */
+
     try {
       const pythonUrl = config.development.backPython;
       const authorizationToken =
@@ -273,6 +349,12 @@ class PuertaController extends AbstractController {
 
   // Función auxiliar para esperar mientras isProcessing es true
   private async waitForProcessing() {
+    /**
+      * Espera mientras la cola de procesamiento está ocupada.
+      *
+      * @returns Promise<void> - Espera 500ms entre intentos.
+    */
+
     while (PuertaController.isProcessing) {
       await new Promise((resolve) => setTimeout(resolve, 500)); // Esperar 500ms
     }
@@ -281,6 +363,13 @@ class PuertaController extends AbstractController {
   // Métodos públicos
 
   public async puertaDisponible(idPuerta: number): Promise<void> {
+    /**
+      * Procesa la cola de puertas disponibles para asignar contenedores.
+      *
+      * @param idPuerta - ID de la puerta disponible.
+      * @returns void - Mensaje indicando el progreso del procesamiento.
+    */
+
     // Agregar a la cola
     PuertaController.processingQueue.push(idPuerta);
     console.log(`Puerta ${idPuerta} agregada a la cola.`);
@@ -383,6 +472,16 @@ class PuertaController extends AbstractController {
     dateTime: string,
     authorizationToken: string
   ): Promise<any> {
+    /**
+      * Acomoda un contenedor en una puerta disponible o lo envía a la fosa si no hay puertas disponibles.
+      *
+      * @param idContenedor - ID del contenedor a acomodar.
+      * @param dateTime - Fecha y hora en formato ISO 8601.
+      * @param authorizationToken - Token de autorización para realizar la operación.
+      * @returns Objeto con detalles de la puerta asignada o lista generada por el modelo.
+      * @throws Error en caso de problemas al asignar el contenedor.
+    */
+
     const pythonUrl = config.development.backPython;
 
     // Validar los parámetros de entrada

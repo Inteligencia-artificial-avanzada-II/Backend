@@ -25,6 +25,7 @@ class QrController extends AbstractController {
   private namespace = BUCKET_NAMESPACE;
   private bucketName = BUCKET_NAME;
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", this.getTest.bind(this));
     this.router.post("/crear", this.postCrear.bind(this));
@@ -34,10 +35,13 @@ class QrController extends AbstractController {
 
   private async getTest(req: Request, res: Response) {
     /**
-     * Prueba de conexión con el controlador
-     * @param - None
-     * @returns - None
-     */
+      * Prueba de conexión con el controlador.
+      *
+      * @param req - Objeto de solicitud HTTP.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Mensaje indicando que la conexión funciona o un mensaje de error.
+    */
+
     try {
       res.status(200).send("Qr Works");
     } catch (error) {
@@ -46,6 +50,15 @@ class QrController extends AbstractController {
   }
 
   private async postCrear(req: Request, res: Response) {
+    /**
+      * Genera un código QR a partir de un texto proporcionado y lo guarda como un archivo en el servidor.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `text` (string en `req.body`): El texto a codificar en el QR.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Ruta del archivo QR generado o mensaje de error.
+    */
+
     try {
       const { text } = req.body; // Recibir el texto del cuerpo del request
 
@@ -94,6 +107,16 @@ class QrController extends AbstractController {
   // }
 
   private async postCrearYSubir(req: Request, res: Response) {
+    /**
+      * Genera un código QR a partir de un texto proporcionado, lo guarda en el servidor
+      * y lo sube a un bucket de almacenamiento en Oracle Cloud.
+      *
+      * @param req - Objeto de solicitud HTTP que debe contener:
+      *   - `text` (string en `req.body`): El texto a codificar en el QR.
+      * @param res - Objeto de respuesta HTTP.
+      * @returns Confirmación de generación y subida o mensaje de error.
+    */
+
     try {
       const { text } = req.body; // Recibir el texto del cuerpo del request
 
@@ -142,6 +165,15 @@ class QrController extends AbstractController {
   }
 
   public async postCrearYSubirPublic(text: string, res: Response) {
+    /**
+      * Genera un código QR como un buffer a partir de un texto proporcionado y lo sube
+      * directamente a un bucket de almacenamiento en Oracle Cloud.
+      *
+      * @param text - El texto que será codificado en el QR.
+      * @param res - Objeto de respuesta HTTP (no utilizado en este caso para enviar respuesta directa).
+      * @returns `true` si la operación fue exitosa, `false` en caso de error.
+    */
+
     try {
 
       if (!text) { 

@@ -8,6 +8,7 @@ interface PuertaContenedorAttributes {
   isActive: boolean;
 }
 
+// Exporta una función que define el modelo PuertaContenedor
 module.exports = (sequelize: Sequelize, DataTypes: any) => {
   class PuertaContenedor
     extends Model<PuertaContenedorAttributes>

@@ -21,6 +21,7 @@ class PriorityProductController extends AbstractController {
         this.model = PriorityProductListModel; // Asignación del modelo PriorityProductModel
     }
 
+    // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
     protected initializeRoutes(): void {
         this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
         this.router.post("/crear", validateTokenMiddleware, this.postCrear.bind(this));
@@ -32,6 +33,13 @@ class PriorityProductController extends AbstractController {
 
     // Métodos privados
     private async getTest(req: Request, res: Response) {
+        /**
+            * Prueba de conexión con el controlador.
+            * 
+            * @param - None
+            * @returns - None
+        */
+
         try {
             res.status(200).send("Priority Product Controller works");
         } catch (error) {
@@ -40,6 +48,17 @@ class PriorityProductController extends AbstractController {
     }
 
     private async postCrear(req: Request, res: Response) {
+        /**
+            * Crea una nueva lista de productos prioritarios en la base de datos.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `products` (array en `req.body`): Lista de productos prioritarios a crear. 
+            *     Si está vacío o no es un array, se inicializará como un array vacío.
+            *     Ejemplo: ["Producto1", "Producto2"]
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Lista de productos prioritarios creada o mensaje de error.
+        */
+
         try {
             const { products } = req.body;
 
@@ -65,6 +84,13 @@ class PriorityProductController extends AbstractController {
     }
 
     private async getTodos(req: Request, res: Response) {
+        /**
+            * Consulta y devuelve todas las listas de productos prioritarios.
+            * 
+            * @param - None
+            * @returns - Lista de productos prioritarios o mensaje de error.
+        */
+
         try {
             const products = await this.model.find();
             res.status(200).json({ message: "Datos obtenidos exitosamene", data: products });
@@ -74,6 +100,16 @@ class PriorityProductController extends AbstractController {
     }
 
     private async getPorId(req: Request, res: Response) {
+        /**
+            * Consulta un producto prioritario específico por su ID.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `id` (string en `req.params`): ID único del producto prioritario a consultar.
+            *     Ejemplo: "/consultar/12345" donde `12345` es el ID.
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Producto prioritario consultado o mensaje de error.
+        */
+
         try {
             const { id } = req.params;
             const product = await this.model.findById(id);
@@ -88,6 +124,17 @@ class PriorityProductController extends AbstractController {
     }
 
     private async putActualizar(req: Request, res: Response) {
+        /**
+            * Actualiza un producto prioritario específico por su ID.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `id` (string en `req.params`): ID único del producto prioritario a actualizar.
+            *   - `req.body` (object): Datos que se van a actualizar en el producto prioritario.
+            *     Ejemplo: { nombre: "Producto Actualizado", prioridad: 1 }
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Producto prioritario actualizado o mensaje de error.
+        */
+
         try {
             const { id } = req.params;
             const updatedProduct = await this.model.findByIdAndUpdate(id, req.body, { new: true });
@@ -102,6 +149,15 @@ class PriorityProductController extends AbstractController {
     }
 
     private async deletePorId(req: Request, res: Response) {
+        /**
+            * Elimina un producto prioritario específico por su ID.
+            * 
+            * @param req - Objeto de solicitud HTTP que debe contener:
+            *   - `id` (string en `req.params`): ID único del producto prioritario a eliminar.
+            * @param res - Objeto de respuesta HTTP.
+            * @returns Mensaje de éxito si el producto prioritario fue eliminado o mensaje de error.
+        */
+
         try {
             const { id } = req.params;
             const deletedProduct = await this.model.findByIdAndDelete(id);
@@ -117,12 +173,27 @@ class PriorityProductController extends AbstractController {
 
     // Métodos públicos
     public async createPriorityProduct(data: PriorityProductList): Promise<PriorityProductList & { _id: string }> {
+        /**
+            * Crea un nuevo producto prioritario en la base de datos.
+            * 
+            * @param data - Objeto que representa el producto prioritario a crear.
+            *     Ejemplo: { nombre: "Producto1", prioridad: 1 }
+            * @returns Producto prioritario creado y guardado en la base de datos.
+        */
+
         const newProduct = new this.model(data);
         const savedProduct = await newProduct.save();
         return savedProduct as PriorityProductList & { _id: string };
     }
 
     public async getPriorityProductById(id: string): Promise<PriorityProductList | null> {
+        /**
+            * Consulta un producto prioritario específico por su ID.
+            * 
+            * @param id - ID único del producto prioritario a consultar.
+            * @returns Producto prioritario consultado o `null` si no se encuentra.
+        */
+
         try {
             const product = await this.model.findById(id).select('-__v -_id').exec();
             return product;

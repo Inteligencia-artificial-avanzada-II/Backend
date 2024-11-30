@@ -13,6 +13,7 @@ class ModeloController extends AbstractController {
     return this._instance;
   }
 
+  // Método protegido donde añadimos todas nuestras rutas y las ligamos con los métodos generados
   protected initializeRoutes(): void {
     this.router.get("/test", validateTokenMiddleware, this.getTest.bind(this));
   }
@@ -22,7 +23,7 @@ class ModeloController extends AbstractController {
      * Prueba de conexión con el controlador
      * @param - None
      * @returns - None
-     */
+    */
     try {
       res.status(200).send("Modelo Works");
     } catch (error) {
